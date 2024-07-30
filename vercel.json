@@ -1,6 +1,6 @@
 {
   "version":2,
-  "framework":"node",
+  "framework":"nextjs",
   "name":"fortuna-stockmarket-simulation",
   "builds":[
     {
