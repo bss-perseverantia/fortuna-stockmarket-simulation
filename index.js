@@ -1,4 +1,5 @@
 const { Database } = require("./database.js");
+const { spawn } = require('child_process');
 const db = new Database();
 const express = require("express");
 const app = express()
@@ -153,3 +154,25 @@ app.get("/setSP", (req, res) => {
         return res.json({ "data": "false" });
     }
 })
+
+app.get("/resetDB", (req, res) => {
+    if (req.query.u == u && req.query.p == p) {
+        db.resetDatabase();
+        res.json({ "data": "success" });
+        
+        function reboot() {
+            process.on("exit", () => {
+                spawn(process.argv.shift(), process.argv, {
+                    cwd: process.cwd(),
+                    stdio: "inherit"
+                });
+            });
+            console.log("Rebooting System!");
+            process.exit();
+        }
+        
+        reboot();
+    } else {
+        return res.json({ "data": "false" });
+    }
+});

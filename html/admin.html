@@ -48,6 +48,8 @@
                 </tr>
             </table>
 
+            <button class="reset-button" onclick="resetDb()">Reset database</button>
+
 
             <br>
             <table class="opacity-75 m-16" id="stocks">
@@ -63,6 +65,17 @@
         </div>
     </div>
     <script>
+
+        function resetDb() {
+            confirm('Are you sure you want to reset the database?')
+            fetch(`/resetDB?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`).then(x => (x.json())).then((d) => {
+                if (d.data == "success") {
+                    alert("success!")
+                }
+            })
+
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             var checkbox = document.querySelector('input[type="checkbox"]');
 

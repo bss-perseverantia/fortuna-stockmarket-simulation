@@ -75,6 +75,7 @@ class Database {
             //accounts[i] = {"username":schools[i],"password":makeid(6)};
         }
         const fs = require("fs")
+        this.ogdb = database;
         //fs.writeFileSync("./database.json", JSON.stringify(database));
         //fs.writeFileSync("./accounts.json", JSON.stringify(accounts));
 
@@ -116,6 +117,9 @@ class Database {
         var data = require("./database.json");
         data.stockprices.find(i => i.name === stock).price = price;
         fs.writeFileSync("./database.json", JSON.stringify(data));
+    }
+    resetDatabase() {
+        fs.writeFileSync("./database.json", JSON.stringify(this.ogdb));
     }
 }
 module.exports = {

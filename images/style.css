@@ -146,3 +146,16 @@ ul {
 li {
     margin-bottom: 0.5rem;
 }
+
+.reset-button {
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    background-color: #f44336;
+}
