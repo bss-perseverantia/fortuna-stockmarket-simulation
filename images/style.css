@@ -1,0 +1,148 @@
+* {
+    margin: 0;
+}
+
+body {
+    /* font-family: 'IBM Plex Mono', monospace; */
+    font-family: Arial, sans-serif;
+}
+
+td,
+th {
+    padding: 1rem 2rem;
+    border: 1px rgb(170, 170, 170) solid;
+    color: white
+}
+
+td:nth-child(1) {
+    font-weight: bold;
+}
+
+@keyframes loss {
+    0% {
+        background-color: #30a623;
+    }
+
+    25% {
+        transform: rotate(5deg)
+    }
+
+    50% {
+        background-color: #ff0000;
+        transform: translate(0.1rem, 1rem);
+    }
+
+    75% {
+        transform: rotate(-5deg)
+    }
+
+    100% {
+        background-color: #30a623;
+    }
+
+
+}
+
+#moneydiv {
+    background-color: #30a623;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 1rem;
+    font-family: 'Yahoo Sans Finance', Arial, Helvetica, sans-serif;
+    font-weight: 600;
+    font-size: 2rem;
+}
+
+#moneydiv.loss {
+    animation-name: loss;
+    animation-duration: 0.25s;
+}
+
+tr:nth-child(even) {
+    background-color: #333;
+}
+
+tr:nth-child(odd) {
+    background-color: #222;
+}
+
+.buy,
+.sell {
+    font-size: 1.0rem;
+    transition: background-color 0.25s, box-shadow 0.25s, padding 0.5s;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+}
+
+.buy {
+    background-color: #ee0212;
+}
+
+.buy:hover {
+    box-shadow: 0 4px 8px 0 rgba(255, 0, 0, 0.2), 0 6px 20px 0 rgba(255, 0, 0, 0.19);
+    background-color: #ff3333;
+}
+
+.sell {
+    background-color: #30a623;
+}
+
+.sell:hover {
+    box-shadow: 0 4px 8px 0 rgba(0, 255, 17, 0.457), 0 6px 20px 0 rgba(255, 0, 0, 0.19);
+    background-color: #3bcd2a;
+}
+
+.bgimg {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url('/fortuna.png')
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.portfolio-button {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    position: relative;
+}
+
+.money-div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: fit-content;
+    margin: 0 auto;
+    font-size: 1.7rem
+}
+
+ul {
+    font-size: 1.2rem;
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 0.5rem;
+}

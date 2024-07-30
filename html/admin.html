@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="fortuna.png" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
+        rel="stylesheet">
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <title>Fortuna - Admin</title>
+</head>
+
+<body style="font-size: 1.3rem;" class="bg-blue-900">
+    <script>
+        let u = prompt('Username');
+        let p = prompt("Password");
+        console.log(u);
+        console.log(p);
+
+        fetch(`/adminauth?u=${u}&p=${p}`).then(x => x.json()).then(d => {
+            console.log(d.data)
+            if (d.data) {
+                localStorage.setItem("u", u);
+                localStorage.setItem("p", p);
+
+            }
+            else {
+                window.location.href = "/"
+            }
+        })
+    </script>
+
+    <div class=" flex justify-center items-center flex-col ">
+        <div class="bg-gray-900 flex items-center flex-col p-8 rounded-xl m-8 bgimg "
+            style="min-height: calc(100vh - 4rem);width: calc(100vw - 4rem);">
+
+            <table class="opacity-75 m-16">
+                <tr>
+                    <td>Trade Time: </td>
+                    <td><label class="switch"><input type="checkbox" id="sw"><span class="slider round"></span></label>
+                    </td>
+                </tr>
+            </table>
+
+
+            <br>
+            <table class="opacity-75 m-16" id="stocks">
+
+            </table>
+            <table class="opacity-75 m-16" id="schools">
+
+            </table>
+
+        </div>
+        <div class="bg-black w-full flex justify-center items-center flex-col text-white rounded-t-2xl">
+            Perseverantia © 2024
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var checkbox = document.querySelector('input[type="checkbox"]');
+
+            checkbox.addEventListener('change', function () {
+                if (checkbox.checked) {
+                    fetch(`/setTT?value=true&u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`).then(x => (x.json())).then((d) => {
+                        if (d.data == "success") {
+
+                        } else {
+                            checkbox.checked = false;
+                        }
+                    })
+                } else {
+                    fetch(`/setTT?value=false&u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`).then(x => (x.json())).then((d) => {
+                        if (d.data == "success") {
+                            alert("success!")
+                        } else {
+                            checkbox.checked = true;
+                        }
+                    })
+                }
+            });
+        });
+        function update() {
+            fetch("/data").then((x) => x.json()).then((x) => {
+                let db = x;
+
+                //  make the trade time toggle accurate
+                var checkbox = document.getElementById('sw');
+                checkbox.checked = db.tradetime;
+
+                let sp = db.stockprices;
+                let sd = db.schooldata;
+                var sdd = "";
+                var d = "";
+
+                // Construct the stock prices table
+                for (let i = 0; i < sp.length; i++) {
+                    d += `<tr><td>${sp[i].name}</td><td>${sp[i].price}</td><td><button onclick='change("${sp[i].name}")' class='bg-orange-600 rounded-xl border-solid border-2 p-4 m-4'>Change</button></td></tr>`;
+                }
+
+                // Calculate the net profit/loss and sort the school data array
+                sd.forEach(school => {
+                    let totalStockValue = 0.0;
+                    school.stocks.forEach((stockQty, index) => {
+                        totalStockValue += stockQty * db.stockprices[index].price;
+                    });
+                    school.netProfitLoss = school.cash + totalStockValue - 1000000;
+                });
+
+                sd.sort((a, b) => b.netProfitLoss - a.netProfitLoss);
+
+                for (let i = 0; i < sd.length; i++) {
+                    let s = sd[i].stocks;
+                    let totalStockValue = 0.0;
+                    for (let j = 0; j < s.length; j++) {
+                        totalStockValue += s[j] * db.stockprices[j].price;
+                    }
+                    let netProfitLoss = sd[i].cash + totalStockValue - 1000000;
+                    sdd += `<tr>
+                <td>${sd[i].schoolcode}</td>
+                <td>₹ ${sd[i].cash.toLocaleString('hi')}</td>
+                <td>₹ ${totalStockValue.toLocaleString('hi')}</td>
+                <td>₹ ${(sd[i].cash + totalStockValue).toLocaleString('hi')}</td>
+                <td class="text-${netProfitLoss < 0 ? "red" : "green"}-400">₹ ${netProfitLoss.toLocaleString('hi')}</td>
+            </tr>`;
+                }
+
+                window.stocks.innerHTML = "<tr><td>Stock Name</td><td>Stock Price</td><td>Set Stock Price</td></tr>" + d;
+                document.getElementById("schools").innerHTML = "<tr><td>School Name</td><td>Standby Cash</td><td>Investment Value</td><td>Portfolio Value</td><td>Net Profit/Loss</td></tr>" + sdd;
+            })
+
+        }
+        setInterval(update, 2000);
+        function change(stock) {
+            let v = parseFloat(prompt("The stock value for " + stock + " should be:"));
+            fetch(`/setSP?value=${v}&u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}&n=${escape(stock)}`).then(x => (x.json())).then((d) => {
+                if (d.data == "success") {
+                    alert("Success!");
+                } else {
+                    alert("Failed.");
+                }
+            })
+        }
+    </script>
+</body>
+<style>
+    /* The switch - the box around the slider */
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+
+    /* Hide default HTML checkbox */
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    /* The slider */
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+    input:checked+.slider {
+        background-color: #2196F3;
+    }
+
+    input:focus+.slider {
+        box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked+.slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+        border-radius: 34px;
+    }
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+</style>
+<script>
+
+</script>
+
+</html>
