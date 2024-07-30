@@ -67,13 +67,13 @@
     <script>
 
         function resetDb() {
-            confirm('Are you sure you want to reset the database?')
-            fetch(`/resetDB?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`).then(x => (x.json())).then((d) => {
-                if (d.data == "success") {
-                    alert("success!")
-                }
-            })
-
+            if (confirm('Are you sure you want to reset the database?')) {
+                fetch(`/resetDB?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`).then(x => (x.json())).then((d) => {
+                    if (d.data == "success") {
+                        alert("success!")
+                    }
+                })
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function () {
