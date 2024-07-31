@@ -18,7 +18,6 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 
 setInterval(() => {
-    return;
     if (!tradetime) return;
     let sl = db.getstockList();
     for (let i = 0; i < sl.length; i++) {
