@@ -53,12 +53,17 @@
         </div>
     </div>
     <script>
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
         let l = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         function update() {
             fetch("/data").then((x) => x.json()).then((x) => {
                 let db = x;
                 let sp = db.stockprices;
-                const ssid = document.cookie.split("=")[1].split("_")[0];
+                const ssid = getCookie("ssid").split("_")[0];
                 let si = db.schooldata.findIndex(schoolData => schoolData.schoolcode === ssid);
                 document.getElementById("cash").innerHTML = db.schooldata[si].cash.toFixed(2);
                 var d = ""
@@ -84,14 +89,14 @@
         }
         setInterval(update, 2000);
         function buy(stock) {
-            const ssid = document.cookie.split("=")[1];
+            const ssid = getCookie("ssid");
             fetch("/buyStock?school=" + ssid + "&stock=" + stock).then((x) => x.json()).then((da) => {
                 console.log(da)
             })
             update();
         }
         function sell(stock) {
-            const ssid = document.cookie.split("=")[1];
+            const ssid = getCookie("ssid");
             fetch("/sellStock?school=" + ssid + "&stock=" + stock).then((x) => x.json()).then((da) => {
                 console.log(da)
             })

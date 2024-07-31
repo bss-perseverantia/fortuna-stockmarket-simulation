@@ -70,12 +70,16 @@
                 },
             }
         });
-
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
         function update() {
             fetch("/data").then((x) => x.json()).then((x) => {
                 let db = x;
                 let sp = db.stockprices;
-                const ssid = document.cookie.split("=")[1].split("_")[0];
+                const ssid = getCookie("ssid").split("_")[0];
                 let si = db.schooldata.findIndex(schoolData => schoolData.schoolcode === ssid);
                 let currentcash = parseFloat(db.schooldata[si].cash);
 
