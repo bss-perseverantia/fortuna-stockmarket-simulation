@@ -22,17 +22,13 @@ app.use(bodyParser.urlencoded({ extended: false }))
 setInterval(() => {
     if (!tradetime) return;
     let sl = db.getstockList();
+    let p = 1
     for (let i = 0; i < sl.length; i++) {
         let prices = [sl[i].price];
-        //console.log(prices)
-        let change_vector = Array(prices.length).fill(0.0); // Nudges from people buying or selling
-        //console.log(db.getstockList()) // not needed tysm
         for (let i = 0; i < prices.length; i++) {
-            prices[i] *= 1 + (Math.random() * 2 - 1 + change_vector[i]) / 100; // Random()->(0,1], Random()*2->(0, 2], Random()*2-1->(-1, 1]
-            change_vector[i] = 0.0; // Reset change vector
+            prices[i] *= 1 + (Math.random() * 2 * p - p) / 100;
         }
         db.setStockValue(i, parseFloat(prices[prices.length - 1].toFixed(2)));
-
     }
 }, 2000);
 
