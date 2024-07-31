@@ -10,6 +10,8 @@ let bodyParser = require("body-parser");
 let crypto = require("crypto");
 let cookies = require("cookie-parser");
 let tradetime = true;
+const dotenv = require('dotenv')
+dotenv.config()
 
 app.use(express.static("images"))
 app.use(cookies())
@@ -37,7 +39,7 @@ setInterval(() => {
 app.get("/sellStock", async (req, res) => {
     const stock = req.query.stock;
     const school = req.query.school.split("_")[0];
-    const acc = require("./accounts.json");
+    const acc = JSON.parse(process.env.accounts);
     if (!tradetime) return res.json({ "error": "Trade Time is Disabled!" });
     console.log(stock)
     console.log(school)
@@ -58,7 +60,7 @@ app.get("/buyStock", async (req, res) => {
     const stock = req.query.stock;
     const school = req.query.school.split("_")[0];
     if (!tradetime) return res.json({ "error": "Trade Time is Disabled!" });
-    const acc = require("./accounts.json");
+    const acc = JSON.parse(process.env.accounts);
     console.log(stock)
     console.log(school)
     for (let i = 0; i < acc.length; i++) {
@@ -90,7 +92,7 @@ app.get("/", (req, res) => {
 app.post("/login", (req, res) => {
     let usr = req.body.username.toUpperCase()
     let pass = req.body.password;
-    const acc = require("./accounts.json");
+    const acc = JSON.parse(process.env.accounts);
     if (!usr || !pass) {
         return res.redirect("/?error=Invalid%20username%20or%20password");
     }
@@ -114,6 +116,40 @@ app.get("/data", (req, res) => {
     return res.json(d);
 });
 
+app.get("/getAllPrices", (req, res) => {
+    if (req.query.u == u && req.query.p == p) {
+        let path = './all_prices.json';
+        delete require.cache[require.resolve(path)];
+        let d = require(path);
+        d.tradetime = tradetime;
+        return res.json(d);
+    }
+    else {
+        return res.json({ "data": "false" });
+    }
+})
+
+app.get("/setAllPrices", (req, res) => {
+    if (req.query.u == u && req.query.p == p) {
+        let arr = JSON.parse(req.query.arr)
+        db.setAllPrices(req.query.which, arr);
+        return res.json({ "data": "success" });
+    }
+    else {
+        return res.json({ "data": "false" });
+    }
+})
+
+app.get("/whitePrices", (req, res) => {
+    if (req.query.u == u && req.query.p == p) {
+        db.whitePrices();
+        return res.json({ "data": "success" });
+    }
+    else {
+        return res.json({ "data": "false" });
+    }
+})
+
 app.get("/tt", (req, res) => {
     res.json({ "tradetime": tradetime });
 })
@@ -125,8 +161,8 @@ app.get("/portfolio", (req, res) => {
 app.get("/admin", (req, res) => {
     res.sendFile(__dirname + "/html/admin.html");
 })
-const u = "admin"
-const p = "youshallnotpass"
+const u = process.env.un
+const p = process.env.pass
 
 app.get("/adminauth", (req, res) => {
     if (req.query.u == u && req.query.p == p) {

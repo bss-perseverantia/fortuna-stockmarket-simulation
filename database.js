@@ -44,27 +44,40 @@ class Database {
             "stockprices": []
         };
         database.stockprices = [
-            { "name": "Giovanni Motors", "price": 2048, "sector": "Automobiles" },
-            { "name": "Bunsel Steel", "price": 890, "sector": "Steel" },
-            { "name": "AP Cement", "price": 970, "sector": "Cement" },
+            { "name": "Giovanni Motors", "price": 1179, "sector": "Automobiles" },
+            { "name": "Bunsel Steel", "price": 894, "sector": "Steel" },
+            { "name": "AP Cement", "price": 821, "sector": "Cement" },
             { "name": "Costaviya", "price": 1243, "sector": "Banking" },
-            { "name": "Insula Paints", "price": 2933, "sector": "Paints" },
+            { "name": "Chhatrapati Power", "price": 562, "sector": "Energy" },
             { "name": "Gajanan Housing and Construction", "price": 1430, "sector": "Real Estate (Housing)" },
-            { "name": "Musafir Travels", "price": 7200, "sector": "Tourism" },
+            { "name": "Musafir Travels", "price": 2319, "sector": "Tourism" },
             { "name": "Indigo Entertainment", "price": 252, "sector": "Entertainment" },
-            { "name": "Paramol Insurance", "price": 1500, "sector": "Insurance" },
+            { "name": "Paramol Insurance", "price": 1561, "sector": "Insurance" },
             { "name": "Hilfi Oils", "price": 347, "sector": "Oils" },
             { "name": "Forge X", "price": 3644, "sector": "Logistics" },
             { "name": "Sunset Grove Resort and Hotels", "price": 421, "sector": "Hospitality" },
             { "name": "Vibgyor Aviation", "price": 4321, "sector": "Aviation" },
             { "name": "BuzzWave", "price": 1673, "sector": "Social Networking" },
             { "name": "Codezen", "price": 1370, "sector": "I.T." },
-            { "name": "Fostech Communication", "price": 1000, "sector": "Telecom" },
-            { "name": "Farm 2 Table", "price": 2198, "sector": "Consumer Food" },
-            { "name": "Athlife", "price": 300, "sector": "Athleisure" },
-            { "name": "Medicare", "price": 1114, "sector": "Pharma" },
-            { "name": "Imperial Silk", "price": 750, "sector": "Textiles" }
+            { "name": "Fastech Communication", "price": 1170, "sector": "Telecom" },
+            { "name": "Farm 2 Table", "price": 1095, "sector": "Consumer Food" },
+            { "name": "Athlife", "price": 321, "sector": "Athleisure" },
+            { "name": "Medicure", "price": 1114, "sector": "Pharma" },
+            { "name": "Imperial Silk", "price": 754, "sector": "Textiles" }
         ];
+
+        database.allPrices = [
+            [1179, 894, 821, 1243, 562, 1430, 2319, 252, 1561, 347, 3644, 421, 4321, 1673, 1370, 1170, 1095, 321, 1114, 754],
+            []
+        ];
+        database.whitePrices = false;
+        let allPrices = [
+            [1179, 894, 821, 1243, 562, 1430, 2319, 252, 1561, 347, 3644, 421, 4321, 1673, 1370, 1170, 1095, 321, 1114, 754],
+            [2748, 894, 821, 1243, 703, 1430, 2319, 252, 1561, 256, 3644, 421, 2975, 3674, 1170, 1335, 2198, 321, 1114, 754]
+        ];
+        const fs = require("fs")
+        fs.writeFileSync("./all_prices.json", JSON.stringify(allPrices));
+
         //        var accounts = [];
         for (let i = 0; i < schools.length; i++) {
             database.schooldata.push({
@@ -74,9 +87,8 @@ class Database {
             })
             //accounts[i] = {"username":schools[i],"password":makeid(6)};
         }
-        const fs = require("fs")
         this.ogdb = database;
-        //fs.writeFileSync("./database.json", JSON.stringify(database));
+        fs.writeFileSync("./database.json", JSON.stringify(database));
         //fs.writeFileSync("./accounts.json", JSON.stringify(accounts));
 
 
@@ -119,6 +131,16 @@ class Database {
     }
     resetDatabase() {
         fs.writeFileSync("./database.json", JSON.stringify(this.ogdb));
+    }
+    setAllPrices(which, arr) {
+        var data = require("./database.json");
+        data.allPrices[which] = arr;
+        fs.writeFileSync("./database.json", JSON.stringify(data));
+    }
+    whitePrices() {
+        var data = require("./database.json");
+        data.whitePrices = !data.whitePrices;
+        fs.writeFileSync("./database.json", JSON.stringify(data));
     }
 }
 module.exports = {

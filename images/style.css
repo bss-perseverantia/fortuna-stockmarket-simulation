@@ -147,8 +147,10 @@ li {
     margin-bottom: 0.5rem;
 }
 
-.reset-button {
-    color: white;
+.reset-button,
+.revise-prices-btn,
+.revise-prices-btn-orig,
+.makewhite-btn {
     border: none;
     padding: 10px 20px;
     text-align: center;
@@ -157,5 +159,24 @@ li {
     margin: 4px 2px;
     cursor: pointer;
     border-radius: 4px;
+}
+
+.reset-button {
+    color: white;
     background-color: #f44336;
+}
+
+.revise-prices-btn-orig {
+    color: white;
+    background-color: rgb(235, 174, 4);
+}
+
+.revise-prices-btn {
+    color: white;
+    background-color: #ec64f6;
+}
+
+.makewhite-btn {
+    color: black;
+    background-color: #f1f1f1;
 }

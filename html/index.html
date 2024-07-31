@@ -61,23 +61,54 @@
                 const ssid = document.cookie.split("=")[1].split("_")[0];
                 let si = db.schooldata.findIndex(schoolData => schoolData.schoolcode === ssid);
                 document.getElementById("cash").innerHTML = db.schooldata[si].cash.toFixed(2);
-                var d = ""
-                for (let i = 0; i < sp.length; i++) {
-                    let col = "white";
-                    console.log(l[i] + " " + sp[i].price)
-                    if (l[i] > sp[i].price) { col = "red"; }
-                    else if (l[i] < sp[i].price) { col = "green"; }
-                    else {
-                        const cols = ["red", "green"];
-                        col = cols[Math.floor(Math.random() * cols.length)]
+
+                let matching = -1;
+                console.log(sp)
+                console.log(db.allPrices);
+                for (let i = 0; i < db.allPrices.length; ++i) {
+                    let matches = true;
+                    for (let j = 0; j < db.allPrices[i].length; ++j) {
+                        if (sp[j].price != db.allPrices[i][j]) {
+                            matches = false;
+                            break
+                        }
+                        if (matches) {
+                            matching = i;
+                            break;
+                        }
                     }
-                    l[i] = sp[i].price;
-                    if (!db.tradetime) col = "white";
-
-
-                    d += `<tr><td>${sp[i].sector}</td><td>${sp[i].name}</td><td id="sp${i}" class="text-${col}-400">${sp[i].price}</td><td><button onclick='buy("${sp[i].name}")' class='buy '>Buy</button> <button onclick='sell("${sp[i].name}")' class='sell'>Sell</button></td><td>${db.schooldata[si].stocks[i]}</td></tr>`
                 }
-                console.log(l);
+                let d = ""
+                console.log(matching)
+                if (matching > 0) {
+                    for (let i = 0; i < sp.length; i++) {
+                        let col = "white";
+                        if (!db.whitePrices) {
+                            if (db.allPrices[matching][i] > db.allPrices[matching - 1][i]) {
+                                col = "green";
+                            }
+                            if (db.allPrices[matching][i] < db.allPrices[matching - 1][i]) {
+                                col = "red";
+                            }
+                        }
+                        d += `<tr><td>${sp[i].sector}</td><td>${sp[i].name}</td><td id="sp${i}" class="text-${col}-400">${sp[i].price}</td><td><button onclick='buy("${sp[i].name}")' class='buy '>Buy</button> <button onclick='sell("${sp[i].name}")' class='sell'>Sell</button></td><td>${db.schooldata[si].stocks[i]}</td></tr>`
+                    }
+                } else {
+                    for (let i = 0; i < sp.length; i++) {
+                        let col = "white";
+                        if (l[i] > sp[i].price) { col = "red"; }
+                        else if (l[i] < sp[i].price) { col = "green"; }
+                        else {
+                            const cols = ["red", "green"];
+                            col = cols[Math.floor(Math.random() * cols.length)]
+                        }
+                        l[i] = sp[i].price;
+                        if (!db.tradetime) col = "white";
+
+
+                        d += `<tr><td>${sp[i].sector}</td><td>${sp[i].name}</td><td id="sp${i}" class="text-${col}-400">${sp[i].price}</td><td><button onclick='buy("${sp[i].name}")' class='buy '>Buy</button> <button onclick='sell("${sp[i].name}")' class='sell'>Sell</button></td><td>${db.schooldata[si].stocks[i]}</td></tr>`
+                    }
+                }
                 //<tr><td>${i.name}</td><td id="sp">${i.price}</td><td><button onclick='buy("${i.name}")' class='buy'>Buy</button> <button onclick='sell("${i.name}")' class='sell'>Sell</button></td></tr>
                 window.stocks.innerHTML = "<tr><td>Sector</td><td>Name</td><td >Price</td><td>Buy / Sell</td><td>Qty Owned</td></tr>" + d;
             })

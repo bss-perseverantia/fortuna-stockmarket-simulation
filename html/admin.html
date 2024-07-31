@@ -50,6 +50,17 @@
 
             <button class="reset-button" onclick="resetDb()">Reset database</button>
 
+            <div class="revise-prices">
+                <button class="revise-prices-btn-orig" onclick="revisePrices(0)">Original</button>
+                <button class="revise-prices-btn" onclick="revisePrices(1)">Revised #1</button>
+                <button class="revise-prices-btn" onclick="revisePrices(2)">Revised #2</button>
+                <button class="revise-prices-btn" onclick="revisePrices(3)">Revised #3</button>
+                <button class="revise-prices-btn" onclick="revisePrices(4)">Revised #4</button>
+            </div>
+            <div class="white-prices">
+                <button class="makewhite-btn" onclick="whitePrices()">Make prices white</button>
+            </div>
+
 
             <br>
             <table class="opacity-75 m-16" id="stocks">
@@ -88,6 +99,38 @@
                 }
             });
         });
+
+        function revisePrices(which) {
+            fetch("/data").then((x) => x.json()).then((db) => {
+                fetch(`/getAllPrices?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`).then(x => (x.json())).then((allPrices) => {
+                    if (!confirm('Are you sure you want to revise the prices to revision ' + which + '?')) {
+                        return;
+                    }
+                    // call setAllPrices to do db.allPrices[which] = allPrices using fetch. pass the array as a string as it is being decoded as one
+                    fetch(`/setAllPrices?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}&which=${which}&arr=${JSON.stringify(allPrices[which])}`).then(x => x.json()).then((d) => {
+                    })
+                    let succeeded = true;
+                    for (let i = 0; i < allPrices[which].length; ++i) {
+                        fetch(`/setSP?value=${allPrices[which][i]}&u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}&n=${escape(db.stockprices[i].name)}`).then(x => (x.json())).then((d) => {
+                            if (d.data != "success") {
+                                succeeded = false;
+                            }
+                        })
+                    }
+                    if (!succeeded) {
+                        alert('Failed!');
+                        return;
+                    }
+                    alert('Success!');
+                })
+            })
+        }
+
+        function whitePrices() {
+            fetch(`/whitePrices?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`).then(x => x.json()).then((d) => {
+            })
+        }
+
         function update() {
             fetch("/data").then((x) => x.json()).then((x) => {
                 let db = x;
