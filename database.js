@@ -105,7 +105,6 @@ class Database {
     }
     getstockList() {
         const data = require("./database.json");
-
         return data.stockprices;
     }
     setStockValue(i, prices) {

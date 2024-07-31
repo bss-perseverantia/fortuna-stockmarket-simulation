@@ -18,6 +18,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 
 setInterval(() => {
+    return;
     if (!tradetime) return;
     let sl = db.getstockList();
     for (let i = 0; i < sl.length; i++) {
@@ -107,10 +108,12 @@ app.post("/login", (req, res) => {
 })
 
 app.get("/data", (req, res) => {
-    var d = require("./database.json");
+    let path = './database.json';
+    delete require.cache[require.resolve(path)];
+    let d = require(path);
     d.tradetime = tradetime;
     return res.json(d);
-})
+});
 
 app.get("/tt", (req, res) => {
     res.json({ "tradetime": tradetime });
@@ -158,20 +161,7 @@ app.get("/setSP", (req, res) => {
 app.get("/resetDB", (req, res) => {
     if (req.query.u == u && req.query.p == p) {
         db.resetDatabase();
-        res.json({ "data": "success" });
-        
-        function reboot() {
-            process.on("exit", () => {
-                spawn(process.argv.shift(), process.argv, {
-                    cwd: process.cwd(),
-                    stdio: "inherit"
-                });
-            });
-            console.log("Rebooting System!");
-            process.exit();
-        }
-        
-        reboot();
+        return res.json({ "data": "success" });
     } else {
         return res.json({ "data": "false" });
     }
