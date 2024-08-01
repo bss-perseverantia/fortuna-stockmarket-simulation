@@ -20,8 +20,6 @@
     <script>
         let u = prompt('Username');
         let p = prompt("Password");
-        console.log(u);
-        console.log(p);
 
         fetch(`/adminauth?u=${u}&p=${p}`).then(x => x.json()).then(d => {
             console.log(d.data)
@@ -57,8 +55,12 @@
                 <button class="revise-prices-btn" onclick="revisePrices(3)">Revised #3</button>
                 <button class="revise-prices-btn" onclick="revisePrices(4)">Revised #4</button>
             </div>
-            <div class="white-prices">
-                <button class="makewhite-btn" onclick="whitePrices()">Make prices white</button>
+            <div class="bg-white rounded-lg p-3 m-4 opacity-75">
+                <tr>
+                    <td>Make prices white</td>
+                    <td><label class=" switch"><input type="checkbox" id="white-btn"><span
+                                class="slider round"></span></label>
+                </tr>
             </div>
 
 
@@ -77,7 +79,19 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var checkbox = document.querySelector('input[type="checkbox"]');
+            // var checkbox = document.querySelector('input[type="checkbox"]');
+            var checkbox = document.getElementById('sw');
+            var whiteBtn = document.getElementById('white-btn');
+
+            whiteBtn.addEventListener('change', function () {
+                fetch(`/whitePrices?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`).then(x => (x.json())).then((d) => {
+                    if (d.data == "success") {
+
+                    } else {
+                        checkbox.checked = false;
+                    }
+                })
+            })
 
             checkbox.addEventListener('change', function () {
                 if (checkbox.checked) {
@@ -106,7 +120,6 @@
                     if (!confirm('Are you sure you want to revise the prices to revision ' + which + '?')) {
                         return;
                     }
-                    console.log(allPrices)
                     // call setAllPrices to do db.allPrices[which] = allPrices using fetch. pass the array as a string as it is being decoded as one
                     fetch(`/setAllPrices?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}&which=${which}&arr=${JSON.stringify(allPrices[which])}`).then(x => x.json()).then((d) => {
                     })
@@ -136,9 +149,9 @@
             fetch("/data").then((x) => x.json()).then((x) => {
                 let db = x;
 
-                //  make the trade time toggle accurate
-                var checkbox = document.getElementById('sw');
-                checkbox.checked = db.tradetime;
+                //  make the toggles accurate
+                document.getElementById('sw').checked = db.tradetime;
+                document.getElementById('white-btn').checked = db.whitePrices;
 
                 let sp = db.stockprices;
                 let sd = db.schooldata;
