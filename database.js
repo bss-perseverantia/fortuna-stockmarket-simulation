@@ -68,19 +68,17 @@ class Database {
 
         database.allPrices = [
             [1179, 894, 821, 1243, 562, 1430, 2319, 252, 1561, 347, 3644, 421, 4321, 1673, 1370, 1170, 1095, 321, 1114, 754],
+            [],
+            [],
+            [],
             []
         ];
         database.whitePrices = false;
-        let allPrices = [
-            [1179, 894, 821, 1243, 562, 1430, 2319, 252, 1561, 347, 3644, 421, 4321, 1673, 1370, 1170, 1095, 321, 1114, 754],
-            [2748, 894, 821, 1243, 703, 1430, 2319, 252, 1561, 256, 3644, 421, 2975, 3674, 1170, 1335, 2198, 321, 1114, 754]
-        ];
         const fs = require("fs")
-        fs.writeFileSync("./all_prices.json", JSON.stringify(allPrices));
 
         //        var accounts = [];
         for (let i = 0; i < schools.length; i++) {
-            database.schooldata.push({
+            database.schooldata.push    ({
                 "schoolcode": schools[i],
                 "stocks": Array(database.stockprices.length).fill(0),
                 "cash": 1000000

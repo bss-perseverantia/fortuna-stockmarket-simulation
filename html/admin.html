@@ -106,6 +106,7 @@
                     if (!confirm('Are you sure you want to revise the prices to revision ' + which + '?')) {
                         return;
                     }
+                    console.log(allPrices)
                     // call setAllPrices to do db.allPrices[which] = allPrices using fetch. pass the array as a string as it is being decoded as one
                     fetch(`/setAllPrices?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}&which=${which}&arr=${JSON.stringify(allPrices[which])}`).then(x => x.json()).then((d) => {
                     })
