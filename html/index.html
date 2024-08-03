@@ -1,180 +1,175 @@
 <!doctype html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="shortcut icon" href="fortuna.png" type="image/x-icon" />
+        <link rel="stylesheet" href="/fonts.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css"
+            rel="stylesheet"
+        />
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <link rel="stylesheet" href="style.css" />
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="shortcut icon" href="fortuna.png" type="image/x-icon" />
-    <link rel="stylesheet" href="/fonts.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
-        rel="stylesheet" />
-    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet" />
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <link rel="stylesheet" href="style.css" />
+        <title>Fortuna - Dashboard</title>
+    </head>
 
-    <title>Fortuna - Dashboard</title>
-</head>
+    <body style="font-size: 1.3rem" class="bg-blue-900">
+        <div class="flex flex-col">
+            <div
+                class="bg-gray-900 flex flex-col p-4 rounded-xl m-8 bgimg"
+                style="min-height: calc(100vh - 4rem)"
+            >
+                <div class="portfolio-button">
+                    <a href="/portfolio"
+                        ><button
+                            class="rounded-xl border-white opacity-50 border-solid border-4 p-2 text-white hover:shadow-2xl hover:text-blue-400"
+                        >
+                            Portfolio
+                        </button></a
+                    >
+                </div>
+                <div class="money-div" id="moneydiv">
+                    <span>Cash: ₹</span><span id="cash"></span>
+                </div>
 
-<body style="font-size: 1.3rem" class="bg-blue-900">
-    <div class="flex flex-col">
-        <div class="bg-gray-900 flex flex-col p-4 rounded-xl m-8 bgimg" style="min-height: calc(100vh - 4rem)">
-            <div class="portfolio-button">
-                <a href="/portfolio"><button
-                        class="rounded-xl border-white opacity-50 border-solid border-4 p-2 text-white hover:shadow-2xl hover:text-blue-400">
-                        Portfolio
-                    </button></a>
-            </div>
-            <div class="money-div" id="moneydiv">
-                <span>Cash: ₹</span><span id="cash"></span>
-            </div>
-
-            <div class="bg-gray-900 flex flex-col p-4 rounded-xl m-2 bgimg" style="min-height: calc(100vh - 4rem)">
-                <table id="stocks" style="
+                <div
+                    class="bg-gray-900 flex flex-col p-4 rounded-xl m-2 bgimg"
+                    style="min-height: calc(100vh - 4rem)"
+                >
+                    <table
+                        id="stocks"
+                        style="
                             border: 2px rgb(170, 170, 170) solid;
                             border-collapse: collapse;
-                        " class="m-2 rounded-2xl opacity-75">
-                    <tr>
-                        <td>Sector</td>
-                        <td>Name</td>
-                        <td id="sp">Price</td>
-                        <td>Buy / Sell</td>
-                        <td>Qty Owned</td>
-                    </tr>
-                </table>
+                        "
+                        class="m-2 rounded-2xl opacity-75"
+                    >
+                        <tr>
+                            <td>Sector</td>
+                            <td>Name</td>
+                            <td id="sp">Price</td>
+                            <td>Buy / Sell</td>
+                            <td>Qty Owned</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div
+                class="bg-black w-full flex justify-center items-center flex-col text-white rounded-t-2xl"
+            >
+                Perseverantia © 2024
             </div>
         </div>
+        <script>
+            let l = [
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            ];
+            function update() {
+                fetch("/data")
+                    .then((x) => x.json())
+                    .then((x) => {
+                        let db = x;
+                        let sp = db.stockprices;
+                        const ssid = document.cookie
+                            .split("=")[1]
+                            .split("_")[0];
+                        let si = db.schooldata.findIndex(
+                            (schoolData) => schoolData.schoolcode === ssid,
+                        );
+                        document.getElementById("cash").innerHTML =
+                            db.schooldata[si].cash.toFixed(2);
 
-        <div class="bg-black w-full flex justify-center items-center flex-col text-white rounded-t-2xl">
-            Perseverantia © 2024
-        </div>
-    </div>
-    <script>
-        let l = [
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        ];
-        function update() {
-            fetch("/data")
-                .then((x) => x.json())
-                .then((x) => {
-                    let db = x;
-                    let sp = db.stockprices;
-                    const ssid = document.cookie
-                        .split("=")[1]
-                        .split("_")[0];
-                    let si = db.schooldata.findIndex(
-                        (schoolData) => schoolData.schoolcode === ssid,
-                    );
-                    document.getElementById("cash").innerHTML =
-                        db.schooldata[si].cash.toFixed(2);
-
-                    let matching = -1;
-                    console.log(sp);
-                    console.log(db.allPrices);
-                    for (let i = 0; i < db.allPrices.length; ++i) {
-                        let matches = true;
-                        for (let j = 0; j < db.allPrices[i].length; ++j) {
-                            if (sp[j].price != db.allPrices[i][j]) {
-                                matches = false;
-                                break;
-                            }
-                            if (matches) {
-                                matching = i;
-                                break;
+                        let matching = -1;
+                        console.log(sp);
+                        console.log(db.allPrices);
+                        for (let i = 0; i < db.allPrices.length; ++i) {
+                            let matches = true;
+                            for (let j = 0; j < db.allPrices[i].length; ++j) {
+                                if (sp[j].price != db.allPrices[i][j]) {
+                                    matches = false;
+                                    break;
+                                }
+                                if (matches) {
+                                    matching = i;
+                                    break;
+                                }
                             }
                         }
-                    }
-                    let d = "";
-                    console.log(matching);
-                    if (matching > 0) {
-                        for (let i = 0; i < sp.length; i++) {
-                            let col = "white";
-                            if (!db.whitePrices) {
-                                if (
-                                    db.allPrices[matching][i] >
-                                    db.allPrices[matching - 1][i]
-                                ) {
+                        let d = "";
+                        console.log(matching);
+                        if (matching > 0) {
+                            for (let i = 0; i < sp.length; i++) {
+                                let col = "white";
+                                if (!db.whitePrices) {
+                                    if (
+                                        db.allPrices[matching][i] >
+                                        db.allPrices[matching - 1][i]
+                                    ) {
+                                        col = "green";
+                                    }
+                                    if (
+                                        db.allPrices[matching][i] <
+                                        db.allPrices[matching - 1][i]
+                                    ) {
+                                        col = "red";
+                                    }
+                                }
+                                d += `<tr><td>${sp[i].sector}</td><td>${sp[i].name}</td><td id="sp${i}" class="text-${col}-400">${sp[i].price}</td><td><button onclick='buy(this, "${sp[i].name}")' class='buy '>Buy</button> <button onclick='sell(this, "${sp[i].name}")' class='sell'>Sell</button></td><td>${db.schooldata[si].stocks[i]}</td></tr>`;
+                            }
+                        } else {
+                            for (let i = 0; i < sp.length; i++) {
+                                let col = "white";
+                                if (l[i] > sp[i].price) {
+                                    col = "red";
+                                } else if (l[i] < sp[i].price) {
                                     col = "green";
                                 }
-                                if (
-                                    db.allPrices[matching][i] <
-                                    db.allPrices[matching - 1][i]
-                                ) {
-                                    col = "red";
-                                }
-                            }
-                            d += `<tr><td>${sp[i].sector}</td><td>${sp[i].name}</td><td id="sp${i}" class="text-${col}-400">${sp[i].price}</td><td><button onclick='buy(this, "${sp[i].name}")' class='buy mb-2'>Buy</button> <button onclick='buyM(this, "${sp[i].name}")' class='buy mb-2'>Buy Multiple</button> <br> <button onclick='sell(this, "${sp[i].name}")' class='sell'>Sell</button> <button onclick='sellM(this, "${sp[i].name}")' class='sell'>Sell Multiple</button></td><td>${db.schooldata[si].stocks[i]}</td></tr>`;
-                        }
-                    } else {
-                        for (let i = 0; i < sp.length; i++) {
-                            let col = "white";
-                            if (l[i] > sp[i].price) {
-                                col = "red";
-                            } else if (l[i] < sp[i].price) {
-                                col = "green";
-                            }
-                            // else {
-                            //     const cols = ["red", "green"];
-                            //     col = cols[Math.floor(Math.random() * cols.length)]
-                            // }
-                            l[i] = sp[i].price;
-                            if (!db.tradetime) col = "white";
+                                // else {
+                                //     const cols = ["red", "green"];
+                                //     col = cols[Math.floor(Math.random() * cols.length)]
+                                // }
+                                l[i] = sp[i].price;
+                                if (!db.tradetime) col = "white";
 
-                            d += `<tr><td>${sp[i].sector}</td><td>${sp[i].name}</td><td id="sp${i}" class="text-${col}-400">${sp[i].price}</td><td><button onclick='buy(this, "${sp[i].name}")' class='buy mb-2'>Buy</button> <button onclick='buyM(this, "${sp[i].name}")' class='buy mb-2'>Buy Multiple</button> <br> <button onclick='sell(this, "${sp[i].name}")' class='sell'>Sell</button> <button onclick='sellM(this, "${sp[i].name}")' class='sell'>Sell Multiple</button></td><td>${db.schooldata[si].stocks[i]}</td></tr>`;
+                                d += `<tr><td>${sp[i].sector}</td><td>${sp[i].name}</td><td id="sp${i}" class="text-${col}-400">${sp[i].price}</td><td><button onclick='buy(this, "${sp[i].name}")' class='buy '>Buy</button> <button onclick='sell(this, "${sp[i].name}")' class='sell'>Sell</button></td><td>${db.schooldata[si].stocks[i]}</td></tr>`;
+                            }
                         }
-                    }
-                    //<tr><td>${i.name}</td><td id="sp">${i.price}</td><td><button onclick='buy("${i.name}")' class='buy'>Buy</button> <button onclick='sell("${i.name}")' class='sell'>Sell</button></td></tr>
-                    window.stocks.innerHTML =
-                        "<tr><td>Sector</td><td>Name</td><td >Price</td><td>Buy / Sell</td><td>Qty Owned</td></tr>" +
-                        d;
-                });
-        }
-        setInterval(update, 2000);
-        function buy(element, stock) {
-            const ssid = document.cookie.split("=")[1];
-            fetch("/buyStock?school=" + ssid + "&stock=" + stock)
-                .then((x) => x.json())
-                .then((da) => {
-                    console.log(da.newQuantity);
-                    element.parentElement.parentElement.children[4].innerHTML =
-                        da.newQuantity;
-                });
-        }
-        function buyM(element, stock) {
-            const ssid = document.cookie.split("=")[1];
-            let n = prompt("Enter no. of stocks:");
-            fetch("/buyStock?school=" + ssid + "&stock=" + stock + "&n=" + n)
-                .then((x) => x.json())
-                .then((da) => {
-                    console.log(da.newQuantity);
-                    element.parentElement.parentElement.children[4].innerHTML =
-                        da.newQuantity;
-                });
-        }
-        function sell(element, stock) {
-            const ssid = document.cookie.split("=")[1];
-            fetch("/sellStock?school=" + ssid + "&stock=" + stock)
-                .then((x) => x.json())
-                .then((da) => {
-                    console.log(da.newQuantity);
-                    element.parentElement.parentElement.children[4].innerHTML =
-                        da.newQuantity;
-                });
-        }
-        function sellM(element, stock) {
-            let n = prompt("Enter no. of stocks:");
-            const ssid = document.cookie.split("=")[1];
-            fetch("/sellStock?school=" + ssid + "&stock=" + stock + "&n=" + n)
-                .then((x) => x.json())
-                .then((da) => {
-                    console.log(da.newQuantity);
-                    element.parentElement.parentElement.children[4].innerHTML =
-                        da.newQuantity;
-                });
-        }
-    </script>
-</body>
-
+                        //<tr><td>${i.name}</td><td id="sp">${i.price}</td><td><button onclick='buy("${i.name}")' class='buy'>Buy</button> <button onclick='sell("${i.name}")' class='sell'>Sell</button></td></tr>
+                        window.stocks.innerHTML =
+                            "<tr><td>Sector</td><td>Name</td><td >Price</td><td>Buy / Sell</td><td>Qty Owned</td></tr>" +
+                            d;
+                    });
+            }
+            setInterval(update, 2000);
+            function buy(element, stock) {
+                const ssid = document.cookie.split("=")[1];
+                fetch("/buyStock?school=" + ssid + "&stock=" + stock)
+                    .then((x) => x.json())
+                    .then((da) => {
+                        console.log(da.newQuantity);
+                        element.parentElement.parentElement.children[4].innerHTML =
+                            da.newQuantity;
+                    });
+            }
+            function sell(element, stock) {
+                const ssid = document.cookie.split("=")[1];
+                fetch("/sellStock?school=" + ssid + "&stock=" + stock)
+                    .then((x) => x.json())
+                    .then((da) => {
+                        console.log(da.newQuantity);
+                        element.parentElement.parentElement.children[4].innerHTML =
+                            da.newQuantity;
+                    });
+            }
+        </script>
+    </body>
 </html>

@@ -55,12 +55,8 @@
                 <button class="revise-prices-btn" onclick="revisePrices(3)">Revised #3</button>
                 <button class="revise-prices-btn" onclick="revisePrices(4)">Revised #4</button>
             </div>
-            <div class="bg-white rounded-lg p-3 m-4 opacity-75">
-                <tr>
-                    <td>Make prices white</td>
-                    <td><label class=" switch"><input type="checkbox" id="white-btn"><span
-                                class="slider round"></span></label>
-                </tr>
+            <div class="white-prices">
+                <button class="makewhite-btn" onclick="whitePrices()">Make prices white</button>
             </div>
 
 
@@ -79,19 +75,7 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // var checkbox = document.querySelector('input[type="checkbox"]');
-            var checkbox = document.getElementById('sw');
-            var whiteBtn = document.getElementById('white-btn');
-
-            whiteBtn.addEventListener('change', function () {
-                fetch(`/whitePrices?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`).then(x => (x.json())).then((d) => {
-                    if (d.data == "success") {
-
-                    } else {
-                        checkbox.checked = false;
-                    }
-                })
-            })
+            var checkbox = document.querySelector('input[type="checkbox"]');
 
             checkbox.addEventListener('change', function () {
                 if (checkbox.checked) {
@@ -149,9 +133,9 @@
             fetch("/data").then((x) => x.json()).then((x) => {
                 let db = x;
 
-                //  make the toggles accurate
-                document.getElementById('sw').checked = db.tradetime;
-                document.getElementById('white-btn').checked = db.whitePrices;
+                //  make the trade time toggle accurate
+                var checkbox = document.getElementById('sw');
+                checkbox.checked = db.tradetime;
 
                 let sp = db.stockprices;
                 let sd = db.schooldata;
