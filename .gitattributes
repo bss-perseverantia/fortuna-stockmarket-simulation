@@ -1,1 +1,3 @@
-*.html linguist-vendored
+index.html linguist-vendored
+admin.html linguist-vendored
+portfolio.html linguist-vendored
