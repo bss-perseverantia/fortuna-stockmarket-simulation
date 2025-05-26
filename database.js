@@ -59,7 +59,10 @@ class Database {
       });
       // accounts[i] = {"username":schools[i],"password":makeid(6)};
     }
+    console.log(database);
+    
     this.ogdb = database;
+    console.log(database==this.ogdb);
     // fs.writeFileSync('./database.json', JSON.stringify(database));
     //  fs.writeFileSync("./accounts.json", JSON.stringify(accounts));
   }
