@@ -22,7 +22,7 @@ class Database {
     const acc = JSON.parse(process.env.accounts);
     
     let schools = []
-    for(let i=0;I<acc.length;i++){
+    for(let i=0;i<acc.length;i++){
       schools.push(acc[i].username);
     }
     var database = {
