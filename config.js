@@ -1,4 +1,5 @@
 module.exports = {
+  cash:1000000,
   "stockprices" : [
       {name: 'Giovanni Motors', price: 1179, sector: 'Automobiles'},
       {name: 'Bunsel Steel', price: 894, sector: 'Steel'},
