@@ -2,184 +2,166 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="shortcut icon" href="fortuna.png" type="image/x-icon" />
-    <link rel="stylesheet" href="/fonts.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
-        rel="stylesheet" />
-    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet" />
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <link rel="stylesheet" href="style.css" />
-
-    <title>Fortuna - Dashboard</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" href="fortuna.png" type="image/x-icon" />
+  <link rel="stylesheet" href="/fonts.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet" />
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+  <title>Fortuna - Dashboard</title>
 </head>
 
-<body style="font-size: 1.3rem" class="bg-blue-900">
-    <div class="flex flex-col">
-        <div class="bg-gray-900 flex flex-col p-4 rounded-xl m-8 bgimg" style="min-height: calc(100vh - 4rem)">
-            <div class="portfolio-button">
-                <a href="/portfolio"><button
-                        class="rounded-xl border-white opacity-50 border-solid border-4 p-2 text-white hover:shadow-2xl hover:text-blue-400">
-                        Portfolio
-                    </button></a>
-            </div>
-            <div class="money-div" id="moneydiv">
-                <span>Cash: ₹</span><span id="cash"></span>
-            </div>
-
-            <div class="bg-gray-900 flex flex-col p-4 rounded-xl m-2 bgimg" style="min-height: calc(100vh - 4rem)">
-                <table id="stocks" style="
-                            border: 2px rgb(170, 170, 170) solid;
-                            border-collapse: collapse;
-                        " class="m-2 rounded-2xl opacity-75">
-                    <tr>
-                        <td>Sector</td>
-                        <td>Name</td>
-                        <td id="sp">Price</td>
-                        <td>Buy / Sell</td>
-                        <td>Qty Owned</td>
-                    </tr>
-                </table>
-            </div>
+<body class="bg-blue-900 text-white text-base sm:text-lg font-mono">
+  <div class="flex flex-col min-h-screen px-2 sm:px-8 py-4">
+    <div class="bg-gray-900 flex flex-col p-4 rounded-xl mb-4 bgimg">
+      <div class="flex justify-between items-center mb-4 flex-wrap gap-4">
+        <a href="/portfolio">
+          <button
+            class="rounded-xl border-white bg-green-500 border-2 px-4 py-2 text-white hover:text-blue-400 hover:shadow-xl transition">
+            Portfolio
+          </button>
+        </a>
+        <div id="moneydiv" class="text-right">
+          <span>Cash: ₹</span><span id="cash"></span>
         </div>
+      </div>
 
-        <div class="bg-black w-full flex justify-center items-center flex-col text-white rounded-t-2xl">
-            Perseverantia &copy; 2024
+      <div class="bg-gray-800 p-4 rounded-xl">
+        <div class="overflow-x-auto">
+          <table id="stocks" class="w-full table-auto border border-gray-400 rounded-xl text-sm sm:text-base">
+            <thead>
+              <tr class="bg-gray-700">
+                <th class="px-2 py-2">Sector</th>
+                <th class="px-2 py-2">Name</th>
+                <th class="px-2 py-2">Price</th>
+                <th class="px-2 py-2">Buy / Sell</th>
+                <th class="px-2 py-2">Qty Owned</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
+      </div>
     </div>
-    <script>
-        let gtt = [];
-        let l = [
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        ];
-        let colors = Array(20).fill("white");
-        function update() {
-            fetch("/data")
-                .then((x) => x.json())
-                .then((x) => {
-                    let db = x;
-                    let sp = db.stockprices;
-                    const ssid = document.cookie
-                        .split("=")[1]
-                        .split("_")[0];
-                    let si = db.schooldata.findIndex(
-                        (schoolData) => schoolData.schoolcode === ssid,
-                    );
-                    document.getElementById("cash").innerHTML =
-                        db.schooldata[si].cash.toLocaleString("hi");
 
-                    let matching = -1;
-                    for (let i = 0; i < db.allPrices.length; ++i) {
-                        let matches = true;
-                        for (let j = 0; j < db.allPrices[i].length; ++j) {
-                            if (sp[j].price != db.allPrices[i][j]) {
-                                matches = false;
-                                break;
-                            }
-                            if (matches) {
-                                matching = i;
-                                break;
-                            }
-                        }
-                    }
-                    let d = "";
-                    if (matching > 0) {
-                        for (let i = 0; i < sp.length; i++) {
-                            let col = "white";
-                            if (!db.whitePrices) {
-                                if (
-                                    db.allPrices[matching][i] >
-                                    db.allPrices[matching - 1][i]
-                                ) {
-                                    col = "green";
-                                }
-                                if (
-                                    db.allPrices[matching][i] <
-                                    db.allPrices[matching - 1][i]
-                                ) {
-                                    col = "red";
-                                }
-                            }
-                            d += `<tr><td>${sp[i].sector}</td><td>${sp[i].name}</td><td id="sp${i}" class="text-${col}-400">${sp[i].price.toLocaleString("hi")}</td><td><button onclick='buy(this, "${sp[i].name}")' class='buy mb-2'>Buy</button> <button onclick='buyM(this, "${sp[i].name}")' class='buy mb-2'>Buy Multiple</button><br><button onclick='sell(this, "${sp[i].name}")' class='sell'>Sell</button> <button onclick='sellM(this, "${sp[i].name}")' class='sell'>Sell Multiple</button></td><td>${db.schooldata[si].stocks[i]}</td></tr>`;
-                        }
-                    } else {
-                        for (let i = 0; i < sp.length; i++) {
-                            let col = "white";
-                            if (l[i] > sp[i].price) {
-                                col = "red";
-                            } else if (l[i] < sp[i].price) {
-                                col = "green";
-                            } else {
-                                col = colors[i];
-                            }
-                            colors[i] = col;
-                            // else {
-                            //     const cols = ["red", "green"];
-                            //     col = cols[Math.floor(Math.random() * cols.length)]
-                            // }
-                            l[i] = sp[i].price;
-                            if (!db.tradetime) col = "white";
+    <footer class="mt-auto bg-black w-full py-4 flex justify-center items-center text-white rounded-t-2xl">
+      Perseverantia &copy; 2024
+    </footer>
+  </div>
 
-                            d += `<tr><td>${sp[i].sector}</td><td>${sp[i].name}</td><td id="sp${i}" class="text-${col}-400">${sp[i].price.toLocaleString("hi")}</td><td><button onclick='buy(this, "${sp[i].name}")' class='buy mb-2'>Buy</button> <button onclick='buyM(this, "${sp[i].name}")' class='buy mb-2'>Bulk</button><br><button onclick='sell(this, "${sp[i].name}")' class='sell'>Sell</button> <button onclick='sellM(this, "${sp[i].name}")' class='sell'>Bulk</button></td><td>${db.schooldata[si].stocks[i]}</td></tr>`;
-                        }
-                    }
-                    //<tr><td>${i.name}</td><td id="sp">${i.price}</td><td><button onclick='buy("${i.name}")' class='buy'>Buy</button> <button onclick='sell("${i.name}")' class='sell'>Sell</button></td></tr>
-                    window.stocks.innerHTML =
-                        "<tr><td>Sector</td><td>Name</td><td >Price</td><td>Buy / Sell</td><td>Qty Owned</td></tr>" +
-                        d;
-                });
-        }
-        setInterval(update, 2000);
-        function buy(element, stock) {
-            const ssid = document.cookie.split("=")[1];
-            fetch("/buyStock?school=" + ssid + "&stock=" + stock)
-                .then((x) => x.json())
-                .then((da) => {
-                    element.parentElement.parentElement.children[4].innerHTML =
-                        da.newQuantity;
-                });
-        }
-        function buyM(element, stock) {
-            const ssid = document.cookie.split("=")[1];
-            let n = prompt("Enter no. of stocks:") || 0;
-            console.log(n);
-            if (n == 0) return;
-            fetch(
-                "/buyStock?school=" + ssid + "&stock=" + stock + "&n=" + n,
-            )
-                .then((x) => x.json())
-                .then((da) => {
-                    element.parentElement.parentElement.children[4].innerHTML =
-                        da.newQuantity;
-                });
-        }
-        function sell(element, stock) {
-            const ssid = document.cookie.split("=")[1];
-            fetch("/sellStock?school=" + ssid + "&stock=" + stock)
-                .then((x) => x.json())
-                .then((da) => {
-                    element.parentElement.parentElement.children[4].innerHTML =
-                        da.newQuantity;
-                });
-        }
-        function sellM(element, stock) {
-            let n = prompt("Enter no. of stocks:") || 0;
-            if (n == 0) return;
-            const ssid = document.cookie.split("=")[1];
-            fetch(
-                "/sellStock?school=" + ssid + "&stock=" + stock + "&n=" + n,
-            )
-                .then((x) => x.json())
-                .then((da) => {
-                    element.parentElement.parentElement.children[4].innerHTML =
-                        da.newQuantity;
-                });
-        }
-    </script>
+  <script>
+    let gtt = [];
+    let l = Array(20).fill(0);
+    let colors = Array(20).fill("white");
+
+    function update() {
+      fetch("/data")
+        .then(res => res.json())
+        .then(db => {
+          let sp = db.stockprices;
+          const ssid = document.cookie.split("=")[1].split("_")[0];
+          let si = db.schooldata.findIndex(x => x.schoolcode === ssid);
+          document.getElementById("cash").innerHTML = db.schooldata[si].cash.toLocaleString("hi");
+
+          let matching = -1;
+          for (let i = 0; i < db.allPrices.length; i++) {
+            let matches = true;
+            for (let j = 0; j < db.allPrices[i].length; j++) {
+              if (sp[j].price !== db.allPrices[i][j]) {
+                matches = false;
+                break;
+              }
+            }
+            if (matches) {
+              matching = i;
+              break;
+            }
+          }
+
+          let d = "";
+          const tableBody = document.querySelector("#stocks tbody");
+
+          for (let i = 0; i < sp.length; i++) {
+            let col = "white";
+            if (matching > 0 && !db.whitePrices) {
+              if (db.allPrices[matching][i] > db.allPrices[matching - 1][i]) col = "green";
+              else if (db.allPrices[matching][i] < db.allPrices[matching - 1][i]) col = "red";
+            } else if (matching === -1) {
+              if (l[i] > sp[i].price) col = "red";
+              else if (l[i] < sp[i].price) col = "green";
+              else col = colors[i];
+              l[i] = sp[i].price;
+              colors[i] = col;
+              if (!db.tradetime) col = "white";
+            }
+
+            d += `
+              <tr>
+                <td class="px-2 py-1">${sp[i].sector}</td>
+                <td class="px-2 py-1">${sp[i].name}</td>
+                <td class="px-2 py-1 text-${col}-400" id="sp${i}">${sp[i].price.toLocaleString("hi")}</td>
+                <td class="px-2 py-1 space-y-1">
+                  <button onclick='buy(this, "${sp[i].name}")' class='buy bg-green-600 px-2 py-1 rounded'>Buy</button>
+                  <button onclick='buyM(this, "${sp[i].name}")' class='buy bg-green-700 px-2 py-1 rounded'>Bulk</button><br>
+                  <button onclick='sell(this, "${sp[i].name}")' class='sell bg-red-600 px-2 py-1 rounded'>Sell</button>
+                  <button onclick='sellM(this, "${sp[i].name}")' class='sell bg-red-700 px-2 py-1 rounded'>Bulk</button>
+                </td>
+                <td class="px-2 py-1">${db.schooldata[si].stocks[i]}</td>
+              </tr>`;
+          }
+
+          tableBody.innerHTML = d;
+        });
+    }
+
+    setInterval(update, 2000);
+
+    function buy(element, stock) {
+      const ssid = document.cookie.split("=")[1];
+      fetch(`/buyStock?school=${ssid}&stock=${stock}`)
+        .then(res => res.json())
+        .then(da => {
+          element.closest("tr").children[4].innerHTML = da.newQuantity;
+        });
+    }
+
+    function buyM(element, stock) {
+      const ssid = document.cookie.split("=")[1];
+      let n = prompt("Enter no. of stocks:") || 0;
+      if (n == 0) return;
+      fetch(`/buyStock?school=${ssid}&stock=${stock}&n=${n}`)
+        .then(res => res.json())
+        .then(da => {
+          element.closest("tr").children[4].innerHTML = da.newQuantity;
+        });
+    }
+
+    function sell(element, stock) {
+      const ssid = document.cookie.split("=")[1];
+      fetch(`/sellStock?school=${ssid}&stock=${stock}`)
+        .then(res => res.json())
+        .then(da => {
+          element.closest("tr").children[4].innerHTML = da.newQuantity;
+        });
+    }
+
+    function sellM(element, stock) {
+      const ssid = document.cookie.split("=")[1];
+      let n = prompt("Enter no. of stocks:") || 0;
+      if (n == 0) return;
+      fetch(`/sellStock?school=${ssid}&stock=${stock}&n=${n}`)
+        .then(res => res.json())
+        .then(da => {
+          element.closest("tr").children[4].innerHTML = da.newQuantity;
+        });
+    }
+  </script>
 </body>
 
 </html>
