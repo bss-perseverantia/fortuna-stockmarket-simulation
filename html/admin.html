@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -7,24 +7,79 @@
     <link rel="shortcut icon" href="fortuna.png" type="image/x-icon" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
-        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet" />
     <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
-
     <title>Fortuna - Admin</title>
+
+    <style>
+        /* Toggle switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+        }
+
+        input:checked+.slider {
+            background-color: #2196f3;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+        @media (max-width: 640px) {
+            .switch {
+                transform: scale(0.9);
+            }
+        }
+    </style>
 </head>
 
-<body style="font-size: 1.3rem" class="bg-blue-900">
+<body class="bg-blue-900 text-white font-['IBM_Plex_Mono'] text-base">
     <script>
         let u = prompt("Username");
         let p = prompt("Password");
-
         fetch(`/adminauth?u=${u}&p=${p}`)
             .then((x) => x.json())
             .then((d) => {
-                console.log(d.data);
                 if (d.data) {
                     localStorage.setItem("u", u);
                     localStorage.setItem("p", p);
@@ -34,105 +89,94 @@
             });
     </script>
 
-    <div class="flex justify-center items-center flex-col">
-        <div class="bg-gray-900 flex items-center flex-col p-8 rounded-xl m-8 bgimg" style="
-                    min-height: calc(100vh - 4rem);
-                    width: calc(100vw - 4rem);
-                ">
-            <table class="opacity-75 m-16">
-                <tr>
-                    <td>Trade Time:</td>
-                    <td>
-                        <label class="switch"><input type="checkbox" id="sw" /><span
-                                class="slider round"></span></label>
-                    </td>
-                </tr>
-            </table>
-
-            <button class="reset-button" onclick="resetDb()">
-                Reset database
-            </button>
-
-            <div class="revise-prices">
-                <select class="revise-prices-dropdown" onchange="revisePrices(this.value)">
-                    <option value="0">Original</option>
-                    <option value="1">Revised #1</option>
-                    <option value="2">Revised #2</option>
-                    <option value="3">Revised #3</option>
-                    <option value="4">Revised #4</option>
-                    <option value="5">Revised #5</option>
-                    <option value="6">Revised #6</option>
-                    <option value="7">Revised #7</option>
-                    <option value="8">Revised #8</option>
-                    <option value="9">Revised #9</option>
-                    <option value="10">Revised #10</option>
-                    <option value="11">Revised #11</option>
-                    <option value="12">Revised #12</option>
-                </select>
+    <div class="flex flex-col items-center p-4">
+        <div class="bg-gray-900 w-full max-w-screen-lg rounded-xl p-4 sm:p-6 md:p-8">
+            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                <div class="flex items-center gap-4">
+                    <span>Trade Time:</span>
+                    <label class="switch">
+                        <input type="checkbox" id="sw" />
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <button class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition-all" onclick="resetDb()">
+                    Reset Database
+                </button>
             </div>
 
-            <div class="bg-white rounded-lg p-3 m-4 opacity-75">
-                <tr>
-                    <td>Make prices white</td>
-                    <td>
-                        <label class="switch"><input type="checkbox" id="white-btn" /><span
-                                class="slider round"></span></label>
-                    </td>
-                </tr>
+            <div class="mb-6">
+                <label for="revise-prices" class="block mb-2">Revise Prices:</label>
+                <select id="revise-prices" class="w-full sm:w-auto px-4 py-2 rounded-md text-black"></select>
+            </div>
+            
+            <div class="flex items-center gap-4 mb-6">
+                <span>Make Prices White</span>
+                <label class="switch">
+                    <input type="checkbox" id="white-btn" />
+                    <span class="slider round"></span>
+                </label>
             </div>
 
-            <br />
-            <table class="opacity-75 m-16" id="stocks"></table>
-            <table class="opacity-75 m-16" id="schools"></table>
+            <!-- Stock Table -->
+            <div class="overflow-x-auto mb-8">
+                <table class="w-full table-auto text-left bg-white text-black rounded-lg overflow-hidden">
+                    <thead class="bg-gray-300">
+                        <tr>
+                            <th class="px-4 py-2">Stock Name</th>
+                            <th class="px-4 py-2">Stock Price</th>
+                            <th class="px-4 py-2">Set Stock Price</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stocks"></tbody>
+                </table>
+            </div>
+
+            <!-- School Table -->
+            <div class="overflow-x-auto mb-4">
+                <table class="w-full table-auto text-left bg-white text-black rounded-lg overflow-hidden">
+                    <thead class="bg-gray-300">
+                        <tr>
+                            <th class="px-4 py-2">School Name</th>
+                            <th class="px-4 py-2">Standby Cash</th>
+                            <th class="px-4 py-2">Investment Value</th>
+                            <th class="px-4 py-2">Portfolio Value</th>
+                            <th class="px-4 py-2">Net Profit/Loss</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schools"></tbody>
+                </table>
+            </div>
         </div>
-        <div class="bg-black w-full flex justify-center items-center flex-col text-white rounded-t-2xl">
+
+        <footer class="bg-black w-full text-center py-4 rounded-t-2xl mt-4">
             Perseverantia © 2024
-        </div>
+        </footer>
     </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // var checkbox = document.querySelector('input[type="checkbox"]');
             var checkbox = document.getElementById("sw");
             var whiteBtn = document.getElementById("white-btn");
 
             whiteBtn.addEventListener("change", function () {
-                fetch(
-                    `/whitePrices?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`,
-                )
+                fetch(`/whitePrices?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`)
                     .then((x) => x.json())
                     .then((d) => {
-                        if (d.data == "success") {
-                        } else {
+                        if (d.data !== "success") {
                             checkbox.checked = false;
                         }
                     });
             });
 
             checkbox.addEventListener("change", function () {
-                if (checkbox.checked) {
-                    fetch(
-                        `/setTT?value=true&u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`,
-                    )
-                        .then((x) => x.json())
-                        .then((d) => {
-                            if (d.data == "success") {
-                            } else {
-                                checkbox.checked = false;
-                            }
-                        });
-                } else {
-                    fetch(
-                        `/setTT?value=false&u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`,
-                    )
-                        .then((x) => x.json())
-                        .then((d) => {
-                            if (d.data == "success") {
-                                alert("success!");
-                            } else {
-                                checkbox.checked = true;
-                            }
-                        });
-                }
+                let value = checkbox.checked ? "true" : "false";
+                fetch(`/setTT?value=${value}&u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`)
+                    .then((x) => x.json())
+                    .then((d) => {
+                        if (d.data !== "success") {
+                            checkbox.checked = !checkbox.checked;
+                        }
+                    });
             });
         });
 
@@ -140,220 +184,116 @@
             fetch("/data")
                 .then((x) => x.json())
                 .then((db) => {
-                    fetch(
-                        `/getAllPrices?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`,
-                    )
+                    fetch(`/getAllPrices?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`)
                         .then((x) => x.json())
                         .then((allPrices) => {
-                            if (
-                                !confirm(
-                                    "Are you sure you want to revise the prices to revision " +
-                                    which +
-                                    "?",
-                                )
-                            ) {
-                                return;
-                            }
-                            // call setAllPrices to do db.allPrices[which] = allPrices using fetch. pass the array as a string as it is being decoded as one
-                            fetch(
-                                `/setAllPrices?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}&which=${which}&arr=${JSON.stringify(allPrices[which])}`,
-                            )
-                                .then((x) => x.json())
-                                .then((d) => { });
+                            if (!confirm("Are you sure you want to revise the prices to revision " + which + "?")) return;
+
+                            fetch(`/setAllPrices?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}&which=${which}&arr=${JSON.stringify(allPrices[which])}`)
+                                .then((x) => x.json());
+
                             let succeeded = true;
-                            for (
-                                let i = 0;
-                                i < allPrices[which].length;
-                                ++i
-                            ) {
-                                fetch(
-                                    `/setSP?value=${allPrices[which][i]}&u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}&n=${escape(db.stockprices[i].name)}`,
-                                )
+                            for (let i = 0; i < allPrices[which].length; ++i) {
+                                fetch(`/setSP?value=${allPrices[which][i]}&u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}&n=${escape(db.stockprices[i].name)}`)
                                     .then((x) => x.json())
                                     .then((d) => {
-                                        if (d.data != "success") {
-                                            succeeded = false;
-                                        }
+                                        if (d.data !== "success") succeeded = false;
                                     });
                             }
+
                             if (!succeeded) {
                                 alert("Failed!");
-                                return;
+                            } else {
+                                alert("Success!");
                             }
-                            alert("Success!");
                         });
                 });
-        }
-
-        function whitePrices() {
-            fetch(
-                `/whitePrices?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`,
-            )
-                .then((x) => x.json())
-                .then((d) => { });
         }
 
         function update() {
             fetch("/data")
                 .then((x) => x.json())
-                .then((x) => {
-                    let db = x;
-
-                    //  make the toggles accurate
+                .then((db) => {
                     document.getElementById("sw").checked = db.tradetime;
-                    document.getElementById("white-btn").checked =
-                        db.whitePrices;
+                    document.getElementById("white-btn").checked = db.whitePrices;
 
                     let sp = db.stockprices;
                     let sd = db.schooldata;
-                    var sdd = "";
-                    var d = "";
+                    let stockHTML = "";
+                    let schoolHTML = "";
 
-                    // Construct the stock prices table
                     for (let i = 0; i < sp.length; i++) {
-                        d += `<tr><td>${sp[i].name}</td><td>${sp[i].price}</td><td><button onclick='change("${sp[i].name}")' class='bg-orange-600 rounded-xl border-solid border-2 p-4 m-4'>Change</button></td></tr>`;
+                        stockHTML += `<tr><td class="px-4 py-2">${sp[i].name}</td><td class="px-4 py-2">${sp[i].price}</td><td class="px-4 py-2"><button onclick='change("${sp[i].name}")' class='bg-orange-600 rounded-xl px-4 py-2'>Change</button></td></tr>`;
                     }
 
-                    // Calculate the net profit/loss and sort the school data array
                     sd.forEach((school) => {
                         let totalStockValue = 0.0;
                         school.stocks.forEach((stockQty, index) => {
-                            totalStockValue +=
-                                stockQty * db.stockprices[index].price;
+                            totalStockValue += stockQty * db.stockprices[index].price;
                         });
-                        school.netProfitLoss =
-                            school.cash + totalStockValue - 1000000;
+                        school.netProfitLoss = school.cash + totalStockValue - 1000000;
                     });
 
                     sd.sort((a, b) => b.netProfitLoss - a.netProfitLoss);
 
-                    for (let i = 0; i < sd.length; i++) {
-                        if (sd[i].schoolcode == "P13" || sd[i].schoolcode == "P31" || sd[i].schoolcode == "P27" || sd[i].schoolcode == "P26" || sd[i].schoolcode == "P14" || sd[i].schoolcode == "P15" || sd[i].schoolcode == "P19" || sd[i].schoolcode == "P20" || sd[i].schoolcode == "P25") {
-                            continue;
-                        }
+
                         let s = sd[i].stocks;
-                        let totalStockValue = 0.0;
-                        for (let j = 0; j < s.length; j++) {
-                            totalStockValue +=
-                                s[j] * db.stockprices[j].price;
-                        }
-                        let netProfitLoss =
-                            sd[i].cash + totalStockValue - 1000000;
-                        sdd += `<tr>
-                <td>${sd[i].schoolcode}</td>
-                <td>₹ ${sd[i].cash.toLocaleString("hi")}</td>
-                <td>₹ ${totalStockValue.toLocaleString("hi")}</td>
-                <td>₹ ${(sd[i].cash + totalStockValue).toLocaleString("hi")}</td>
-                <td class="text-${netProfitLoss < 0 ? "red" : "green"}-400">₹ ${netProfitLoss.toLocaleString("hi")}</td>
-            </tr>`;
+                        let totalStockValue = s.reduce((sum, qty, j) => sum + qty * db.stockprices[j].price, 0);
+                        let netProfitLoss = sd[i].cash + totalStockValue - 1000000;
+
+                        schoolHTML += `<tr>
+                            <td class="px-4 py-2">${sd[i].schoolcode}</td>
+                            <td class="px-4 py-2">₹ ${sd[i].cash.toLocaleString("hi")}</td>
+                            <td class="px-4 py-2">₹ ${totalStockValue.toLocaleString("hi")}</td>
+                            <td class="px-4 py-2">₹ ${(sd[i].cash + totalStockValue).toLocaleString("hi")}</td>
+                            <td class="px-4 py-2 text-${netProfitLoss < 0 ? "red" : "green"}-500">₹ ${netProfitLoss.toLocaleString("hi")}</td>
+                        </tr>`;
                     }
 
-                    window.stocks.innerHTML =
-                        "<tr><td>Stock Name</td><td>Stock Price</td><td>Set Stock Price</td></tr>" +
-                        d;
-                    document.getElementById("schools").innerHTML =
-                        "<tr><td>School Name</td><td>Standby Cash</td><td>Investment Value</td><td>Portfolio Value</td><td>Net Profit/Loss</td></tr>" +
-                        sdd;
+                    document.getElementById("stocks").innerHTML = stockHTML;
+                    document.getElementById("schools").innerHTML = schoolHTML;
                 });
         }
+
+        fetch("/data")
+        .then(res => res.json())
+        .then(data => {
+            const dropdown = document.getElementById("revise-prices");
+            const allPrices = data.allPrices;
+
+            for (let i = 0; i < allPrices.length-1; i++) {
+                const option = document.createElement("option");
+                option.value = i;
+                option.text = i === 0 ? "Original" : `Revised #${i}`;
+                dropdown.appendChild(option);
+            }
+
+            // Attach onchange after populating
+            dropdown.addEventListener("change", function () {
+                revisePrices(this.value);
+            });
+        });
+
+
+        
+
         setInterval(update, 2000);
+
         function change(stock) {
-            let v = parseFloat(
-                prompt("The stock value for " + stock + " should be:"),
-            );
-            fetch(
-                `/setSP?value=${v}&u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}&n=${escape(stock)}`,
-            )
+            let v = parseFloat(prompt("The stock value for " + stock + " should be:"));
+            fetch(`/setSP?value=${v}&u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}&n=${escape(stock)}`)
                 .then((x) => x.json())
-                .then((d) => {
-                    if (d.data == "success") {
-                        alert("Success!");
-                    } else {
-                        alert("Failed.");
-                    }
-                });
+                .then((d) => alert(d.data === "success" ? "Success!" : "Failed."));
         }
+
         function resetDb() {
             if (confirm("Are you sure you want to reset the database?")) {
-                fetch(
-                    `/resetDB?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`,
-                )
+                fetch(`/resetDB?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`)
                     .then((x) => x.json())
-                    .then((d) => {
-                        if (d.data == "success") {
-                            alert("Success!");
-                        } else {
-                            alert("Failed.");
-                        }
-                    });
+                    .then((d) => alert(d.data === "success" ? "Success!" : "Failed."));
             }
         }
     </script>
 </body>
-<style>
-    /* The switch - the box around the slider */
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 34px;
-    }
-
-    /* Hide default HTML checkbox */
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-    /* The slider */
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        -webkit-transition: 0.4s;
-        transition: 0.4s;
-    }
-
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 26px;
-        width: 26px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        -webkit-transition: 0.4s;
-        transition: 0.4s;
-    }
-
-    input:checked+.slider {
-        background-color: #2196f3;
-    }
-
-    input:focus+.slider {
-        box-shadow: 0 0 1px #2196f3;
-    }
-
-    input:checked+.slider:before {
-        -webkit-transform: translateX(26px);
-        -ms-transform: translateX(26px);
-        transform: translateX(26px);
-    }
-
-    /* Rounded sliders */
-    .slider.round {
-        border-radius: 34px;
-    }
-
-    .slider.round:before {
-        border-radius: 50%;
-    }
-</style>
-<script></script>
 
 </html>
