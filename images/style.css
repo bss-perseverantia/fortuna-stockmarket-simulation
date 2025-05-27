@@ -94,12 +94,12 @@ tr:nth-child(odd) {
     box-shadow: 0 4px 8px 0 rgba(0, 255, 17, 0.457), 0 6px 20px 0 rgba(255, 0, 0, 0.19);
     background-color: #3bcd2a;
 }
-
+/*
 .bgimg {
     background-repeat: no-repeat;
     background-position: center;
     background-image: url('/fortuna.png')
-}
+}*/
 
 /* width */
 ::-webkit-scrollbar {
