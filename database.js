@@ -32,21 +32,10 @@ class Database {
     database.stockprices = config.stockprices;
     const sp = JSON.parse(process.env.all_prices);
 
-    database.allPrices = [
-      sp[0],
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-      [],
-    ];
+    database.allPrices = [sp[0]];
+    for(let i=0;i<sp.length;i++){
+      database.allPrices.push([]);
+    }
     database.whitePrices = false;
     const fs = require('fs');
 
