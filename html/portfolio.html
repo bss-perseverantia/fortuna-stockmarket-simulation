@@ -2,149 +2,151 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="shortcut icon" href="fortuna.png" type="image/x-icon" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
-        rel="stylesheet" />
-    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="style.css" />
-
-    <title>Fortuna - Portfolio</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" href="fortuna.png" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css" />
+  <title>Fortuna - Portfolio</title>
 </head>
 
-<body style="font-size: 1.3rem" class="bg-blue-900">
-    <div>
-        <div class="flex flex-col">
-            <div class="portfolio-button">
-                <a href="/index"><button
-                        class="rounded-xl border-white opacity-50 border-solid border-4 p-2 m-4 text-white hover:shadow-2xl hover:text-blue-400">
-                        Dashboard
-                    </button></a>
-            </div>
-        </div>
-
-        <div class="flex justify-center">
-            <div class="bg-gray-900 flex flex-col p-8 m-8 rounded-xl" style="width: 90%; min-height: calc(50vh)">
-                <canvas id="myChart" class="bg-blue-900 rounded-xl opacity-100"
-                    style="max-width: 100%; max-height: 70vh"></canvas>
-            </div>
-        </div>
-
-        <div class="stock-stats">
-            <div class="bg-gray-800 p-6 rounded-xl shadow-lg mx-8 mb-8">
-                <h1 class="text-3xl font-bold text-center mb-6 text-white">
-                    Stock Holdings
-                </h1>
-                <ul id="stock-list" class="max-w-lg mx-auto p-0 list-none">
-                    <!-- items will be filled here -->
-                </ul>
-            </div>
-        </div>
-        <div class="bg-black w-full flex justify-center items-center flex-col text-white rounded-t-2xl">
-            Perseverantia © 2024
-        </div>
+<body class="bg-blue-900 text-white font-mono text-base sm:text-lg">
+  <div class="min-h-screen flex flex-col">
+    <div class="flex flex-col p-4 sm:p-6">
+      <div class="mb-4">
+        <a href="/index">
+          <button
+            class="rounded-xl border-white opacity-50 border-4 p-2 text-white hover:shadow-2xl hover:text-blue-400 transition">
+            Dashboard
+          </button>
+        </a>
+      </div>
     </div>
 
-    <script>
-        let xValues = [];
-        let yValues = [];
-        const ctx = document.getElementById("myChart");
-        Chart.defaults.backgroundColor = "#9BD0F5";
-        Chart.defaults.borderColor = "#36A2EB";
-        Chart.defaults.color = "#ffffff";
-        let stockChart = new Chart(ctx, {
-            type: "bar",
-            data: {
-                labels: xValues,
-                datasets: [
-                    {
-                        label: "# of shares",
-                        data: yValues,
-                        borderWidth: 1,
-                    },
-                ],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                    },
-                },
-            },
+    <div class="flex justify-center px-4">
+      <div class="bg-gray-900 p-4 sm:p-8 rounded-xl w-full max-w-5xl">
+        <div class="w-full h-[50vh] sm:h-[60vh]">
+          <canvas id="myChart" class="bg-blue-900 rounded-xl w-full h-full"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-4 sm:px-8 mt-6">
+      <div class="bg-gray-800 p-4 sm:p-6 rounded-xl shadow-lg w-full max-w-5xl mx-auto">
+        <h1 class="text-2xl sm:text-3xl font-bold text-center mb-6">Stock Holdings</h1>
+        <ul id="stock-list" class="list-none p-0 w-full"></ul>
+      </div>
+    </div>
+
+    <footer class="bg-black mt-8 py-4 text-center rounded-t-2xl">
+      Perseverantia © 2024
+    </footer>
+  </div>
+
+  <script>
+    let xValues = [];
+    let yValues = [];
+    const ctx = document.getElementById("myChart");
+
+    Chart.defaults.backgroundColor = "#9BD0F5";
+    Chart.defaults.borderColor = "#36A2EB";
+    Chart.defaults.color = "#ffffff";
+
+    let stockChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: xValues,
+        datasets: [
+          {
+            label: "# of shares",
+            data: yValues,
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+
+    function update() {
+      fetch("/data")
+        .then((x) => x.json())
+        .then((x) => {
+          let db = x;
+          let sp = db.stockprices;
+          const ssid = document.cookie.split("=")[1].split("_")[0];
+          let si = db.schooldata.findIndex((schoolData) => schoolData.schoolcode === ssid);
+          let currentcash = parseFloat(db.schooldata[si].cash);
+
+          xValues = db.stockprices.map((x) => x.name);
+          yValues = db.schooldata[si].stocks;
+
+          while (yValues.indexOf(0) !== -1) {
+            let i = yValues.indexOf(0);
+            yValues.splice(i, 1);
+            xValues.splice(i, 1);
+          }
+
+          const stockList = document.getElementById("stock-list");
+          let stats_html = "";
+          let totalinvstocks = 0;
+
+          for (let i = 0; i < yValues.length; ++i) {
+            let profit = db.stockprices.find((s) => s.name === xValues[i]).price * yValues[i];
+            totalinvstocks += profit;
+
+            stats_html += `
+              <li class="bg-[#1A202C] border border-gray-700 rounded-lg mb-4 p-4 flex justify-between items-center">
+                <span class="font-semibold">${xValues[i]}</span>
+                <span class="text-green-400 text-lg">₹${profit.toLocaleString("hi")}</span>
+              </li>`;
+          }
+
+          const networth = totalinvstocks + currentcash;
+          const profitloss = networth - 1000000;
+          const netColor = networth > 1000000 ? "green" : "red";
+
+          stockList.innerHTML =
+            stats_html +
+            `<br><hr class="w-full my-2">
+            <li class="bg-[#1A202C] border border-gray-700 rounded-lg mb-4 p-4 flex justify-between items-center">
+              <span class="font-semibold">TOTAL INVESTED IN STOCKS:</span>
+              <span class="text-orange-400 text-lg">₹${totalinvstocks.toLocaleString("hi")}</span>
+            </li>
+            <li class="bg-[#1A202C] border border-gray-700 rounded-lg mb-4 p-4 flex justify-between items-center">
+              <span class="font-semibold">Standby Cash:</span>
+              <span class="text-orange-400 text-lg">₹${currentcash.toLocaleString("hi")}</span>
+            </li>
+            <li class="bg-[#1A202C] border border-gray-700 rounded-lg mb-4 p-4 flex justify-between items-center">
+              <span class="font-semibold">NET WORTH:</span>
+              <span class="text-${netColor}-400 text-lg">₹${networth.toLocaleString("hi")}</span>
+            </li>
+            <li class="bg-[#1A202C] border border-gray-700 rounded-lg mb-4 p-4 flex justify-between items-center">
+              <span class="font-semibold">NET <span class="text-green-400">PROFIT</span>/<span class="text-red-400">LOSS</span>:</span>
+              <span class="text-${netColor}-400 text-lg">₹${profitloss.toLocaleString("hi")}</span>
+            </li>`;
+
+          stockChart.data.labels = xValues;
+          stockChart.data.datasets[0].data = yValues;
+          stockChart.update();
         });
+    }
 
-        function update() {
-            fetch("/data")
-                .then((x) => x.json())
-                .then((x) => {
-                    let db = x;
-                    let sp = db.stockprices;
-                    const ssid = document.cookie
-                        .split("=")[1]
-                        .split("_")[0];
-                    let si = db.schooldata.findIndex(
-                        (schoolData) => schoolData.schoolcode === ssid,
-                    );
-                    let currentcash = parseFloat(db.schooldata[si].cash);
-
-                    xValues = db.stockprices.map((x) => x.name);
-                    yValues = db.schooldata[si].stocks;
-                    while (yValues.findIndex((d) => d === 0) != -1) {
-                        let i = yValues.findIndex((d) => d === 0);
-                        yValues.splice(i, 1);
-                        xValues.splice(i, 1);
-                    }
-
-                    const stockList = document.getElementById("stock-list");
-                    let stats_html = "";
-                    var totalinvstocks = 0.0;
-                    for (let i = 0; i < yValues.length; ++i) {
-                        let profit =
-                            db.stockprices.find(
-                                (stock) => stock.name === xValues[i],
-                            ).price * yValues[i];
-                        totalinvstocks = profit + totalinvstocks;
-                        stats_html += `
-                        <li class="bg-[#1A202C] border border-gray-700 rounded-lg mb-4 p-4 shadow-md flex justify-between items-center">
-                            <span class="text-white font-semibold">${xValues[i]}</span>
-                            <span class="text-green-400 text-lg">₹${profit.toLocaleString("hi")}</span>
-                        </li>
-                    `;
-                    }
-                    stockList.innerHTML =
-                        stats_html +
-                        `<br><hr class="w-full" ><br><li class="bg-[#1A202C] border border-gray-700 rounded-lg mb-4 p-4 shadow-md flex justify-between items-center">
-                            <span class="text-white font-semibold">TOTAL INVESTED IN STOCKS: </span>
-                            <span class="text-orange-400 text-lg">₹${totalinvstocks.toLocaleString("hi")}</span>
-                        </li>` +
-                        `<li class="bg-[#1A202C] border border-gray-700 rounded-lg mb-4 p-4 shadow-md flex justify-between items-center">
-                            <span class="text-white font-semibold">Standby Cash: </span>
-                            <span class="text-orange-400 text-lg">₹${currentcash.toLocaleString("hi")}</span>
-                        </li>` +
-                        `<li class="bg-[#1A202C] border border-gray-700 rounded-lg mb-4 p-4 shadow-md flex justify-between items-center">
-                            <span class="text-white font-semibold">NET WORTH: </span>
-                            <span class="text-${totalinvstocks + currentcash > 1000000 ? "green" : "red"}-400 text-lg">₹${(totalinvstocks + currentcash).toLocaleString("hi")}</span>
-                        </li>` +
-                        `<li class="bg-[#1A202C] border border-gray-700 rounded-lg mb-4 p-4 shadow-md flex justify-between items-center">
-                            <span class="text-white font-semibold">NET <span class="text-green-400">PROFIT</span>/<span class="text-red-400">LOSS</span>: </span>
-                            <span class="text-${totalinvstocks + currentcash > 1000000 ? "green" : "red"}-400 text-lg">₹${(totalinvstocks + currentcash - 1000000).toLocaleString("hi")}</span>
-                        </li>`;
-
-                    stockChart.data.labels = xValues;
-                    stockChart.data.datasets[0].data = yValues;
-                    stockChart.update();
-                });
-        }
-        setInterval(update, 2000);
-    </script>
-    <!-- <script src="frontend.js"></script> -->
+    setInterval(update, 2000);
+  </script>
 </body>
 
 </html>
