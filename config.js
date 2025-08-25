@@ -4,17 +4,20 @@ module.exports = {
   {
     "name": "Aarav Motors",
     "price": 1000,
-    "sector": "Automobiles"
+    "sector": "Automobiles",
+    "totalStock": 1000
   },
   {
     "name": "Aarav F1 Team",
     "price": 1500,
-    "sector": "Sports"
+    "sector": "Sports",
+    "totalStock": 1500
   },
   {
     "name": "Aarav Laptop Servicing",
     "price": 300,
-    "sector": "IT"
+    "sector": "IT",
+    "totalStock": 1300
   }
 ]
 };

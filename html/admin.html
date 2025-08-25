@@ -725,10 +725,13 @@
             holdingsDiv.innerHTML = holdingsHTML;
         }
 
-        function executeTransaction() {
+        async function executeTransaction() {
             const action = document.querySelector('input[name="action"]:checked');
             const stockIndex = document.getElementById('stockSelect').value;
             const quantity = parseInt(document.getElementById('quantityInput').value);
+
+            let res = await fetch("/data");
+            let db = await res.json();
             
             if (!action) {
                 alert('Please select Buy or Sell');
@@ -756,7 +759,12 @@
             
             // Use real account credentials for authentication
             const realAuth = currentSchool + '_' + accountCredentials[currentSchool];
-            
+
+            if (schoolData.stocks[stockIndex] + quantity > db.stockprices[stockIndex].totalStock) {
+                alert(`Less than ${quantity} stocks exist: can't buy!`);
+                return;
+            }
+
             const endpoint = action.value === 'buy' ? '/buyStock' : '/sellStock';
             const url = `${endpoint}?school=${encodeURIComponent(realAuth)}&stock=${encodeURIComponent(stock.name)}&n=${quantity}`;
             
