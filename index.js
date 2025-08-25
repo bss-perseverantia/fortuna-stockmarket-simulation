@@ -1,4 +1,5 @@
 const {Database} = require('./database.js');
+require('dotenv').config();
 const {spawn} = require('child_process');
 const db = new Database();
 const express = require('express');
@@ -16,24 +17,25 @@ dotenv.config();
 app.use(express.static('images'));
 app.use(cookies());
 app.use(bodyParser.urlencoded({extended: false}));
-let gtt = [];
-
-setInterval(() => {
-  if (!tradetime) {
-    return;
-  }
-  let sl = db.getstockList();
-  let newV = [];
-  let p = 1;
-  for (let i = 0; i < sl.length; i++) {
-    let np = parseFloat(
-        (+sl[i].price * (1 + ((Math.random() * 2 - 1) * p) / 100)).toFixed(2),
-    );
-    newV.push(np)
-    db.setStockValue(i, np);
-  }
-  gtt.map((x) => {})
-}, 2000);
+app.get('/stockPrices',(req,res)=>{
+  res.sendFile(__dirname + '/html/stockprices.html');
+})
+const path = require('path');
+app.use(
+"/static",
+express.static(path.join(process.cwd(), "static"), {
+maxAge: "1y", // cache for a year
+immutable: true, // tells the browser it never changes
+etag: true, // allow 304 revalidation if needed
+lastModified: true, // (default) also fine
+setHeaders(res, filePath) {
+// Make it explicit and compatible with CDNs
+res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+// Optional: precompressed files if you have them (see §4)
+// res.setHeader("Vary", "Accept-Encoding");
+},
+})
+);
 
 app.get('/sellStock', async (req, res) => {
   const stock = req.query.stock;
@@ -73,10 +75,15 @@ app.get('/buyStock', async (req, res) => {
   }
   return res.json({error: 'Invalid Auth'});
 });
-
+/*
 app.get('/index', (req, res) => {
   return res.sendFile(__dirname + '/html/index.html');
 });
+*/
+app.get('/index', (req, res) => {
+  return res.sendFile(__dirname + '/html/merged-portfolio.html');
+});
+
 
 app.get('/api/stockPrices', (req, res) => {
   let sl = db.getstockList();
@@ -130,6 +137,13 @@ app.get('/setAllPrices', (req, res) => {
     return res.json({data: 'success'});
   } else {
     return res.json({data: 'false'});
+  }
+});
+app.get('/getAllAccounts', (req, res) => {
+  if (req.query.u == u && req.query.p == p) {
+    return res.sendFile(__dirname+"/accounts.json");
+  } else {
+    return res.status(500).json({data: 'false'});
   }
 });
 
@@ -190,3 +204,5 @@ app.get('/resetDB', (req, res) => {
     return res.json({data: 'false'});
   }
 });
+
+

@@ -22,14 +22,8 @@
     <div class="bg-gray-900 flex flex-col p-4 rounded-xl mb-4 bgimg">
       <div class="flex justify-between items-center mb-4 flex-wrap gap-4">
         <a href="/portfolio">
-          <button
-            class="rounded-xl border-white bg-green-500 border-2 px-4 py-2 text-white hover:text-blue-400 hover:shadow-xl transition">
-            Portfolio
-          </button>
+          
         </a>
-        <div id="moneydiv" class="text-right">
-          <span>Cash: ₹</span><span id="cash"></span>
-        </div>
       </div>
 
       <div class="bg-gray-800 p-4 rounded-xl">
@@ -40,8 +34,8 @@
                 <th class="px-2 py-2">Sector</th>
                 <th class="px-2 py-2">Name</th>
                 <th class="px-2 py-2">Price</th>
-                <th class="px-2 py-2">Buy / Sell</th>
-                <th class="px-2 py-2">Qty Owned</th>
+                <th class="px-2 py-2">Volume Bought</th>
+                <th class="px-2 py-2">Volume in Market</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -67,7 +61,6 @@
           let sp = db.stockprices;
           const ssid = document.cookie.split("=")[1].split("_")[0];
           let si = db.schooldata.findIndex(x => x.schoolcode === ssid);
-          document.getElementById("cash").innerHTML = db.schooldata[si].cash.toLocaleString("hi");
 
           let matching = -1;
           for (let i = 0; i < db.allPrices.length; i++) {
@@ -89,16 +82,11 @@
 
           for (let i = 0; i < sp.length; i++) {
             let col = "white";
-            if (matching > 0 && !db.whitePrices) {
-              if (db.allPrices[matching][i] > db.allPrices[matching - 1][i]) col = "green";
-              else if (db.allPrices[matching][i] < db.allPrices[matching - 1][i]) col = "red";
-            } else if (matching === -1) {
-              if (l[i] > sp[i].price) col = "red";
-              else if (l[i] < sp[i].price) col = "green";
-              else col = colors[i];
-              l[i] = sp[i].price;
-              colors[i] = col;
-              if (!db.tradetime) col = "white";
+            
+            // Calculate total volume (total shares owned by all schools for this stock)
+            let totalVolume = 0;
+            for (let j = 0; j < db.schooldata.length; j++) {
+              totalVolume += db.schooldata[j].stocks[i] || 0;
             }
 
             d += `
@@ -106,62 +94,19 @@
                 <td class="px-2 py-1">${sp[i].sector}</td>
                 <td class="px-2 py-1">${sp[i].name}</td>
                 <td class="px-2 py-1 text-${col}-400" id="sp${i}">${sp[i].price.toLocaleString("hi")}</td>
-                <td class="px-2 py-1 space-y-1">
-                  <button onclick='buy(this, "${sp[i].name}")' class='buy bg-green-600 px-2 py-1 rounded'>Buy</button>
-                  <button onclick='buyM(this, "${sp[i].name}")' class='buy bg-green-700 px-2 py-1 rounded'>Bulk</button><br>
-                  <button onclick='sell(this, "${sp[i].name}")' class='sell bg-red-600 px-2 py-1 rounded'>Sell</button>
-                  <button onclick='sellM(this, "${sp[i].name}")' class='sell bg-red-700 px-2 py-1 rounded'>Bulk</button>
-                </td>
-                <td class="px-2 py-1">${db.schooldata[si].stocks[i]}</td>
+                <td class="px-2 py-1">${totalVolume.toLocaleString("hi")}</td>
+                <td class="px-2 py-1">400</td>
+              
               </tr>`;
           }
 
           tableBody.innerHTML = d;
         });
     }
-    
-    document.addEventListener("DOMContentLoaded", update);
+
     setInterval(update, 1000);
+    document.addEventListener("DOMContentLoaded", update);
 
-    function buy(element, stock) {
-      const ssid = document.cookie.split("=")[1];
-      fetch(`/buyStock?school=${ssid}&stock=${stock}`)
-        .then(res => res.json())
-        .then(da => {
-          element.closest("tr").children[4].innerHTML = da.newQuantity;
-        });
-    }
-
-    function buyM(element, stock) {
-      const ssid = document.cookie.split("=")[1];
-      let n = prompt("Enter no. of stocks:") || 0;
-      if (n == 0) return;
-      fetch(`/buyStock?school=${ssid}&stock=${stock}&n=${n}`)
-        .then(res => res.json())
-        .then(da => {
-          element.closest("tr").children[4].innerHTML = da.newQuantity;
-        });
-    }
-
-    function sell(element, stock) {
-      const ssid = document.cookie.split("=")[1];
-      fetch(`/sellStock?school=${ssid}&stock=${stock}`)
-        .then(res => res.json())
-        .then(da => {
-          element.closest("tr").children[4].innerHTML = da.newQuantity;
-        });
-    }
-
-    function sellM(element, stock) {
-      const ssid = document.cookie.split("=")[1];
-      let n = prompt("Enter no. of stocks:") || 0;
-      if (n == 0) return;
-      fetch(`/sellStock?school=${ssid}&stock=${stock}&n=${n}`)
-        .then(res => res.json())
-        .then(da => {
-          element.closest("tr").children[4].innerHTML = da.newQuantity;
-        });
-    }
   </script>
 </body>
 

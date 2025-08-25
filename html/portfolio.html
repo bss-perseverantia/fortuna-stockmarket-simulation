@@ -10,7 +10,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap"
     rel="stylesheet" />
-  <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet" />
+  <link href="/static/tailwind.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="style.css" />
   <title>Fortuna - Portfolio</title>
@@ -145,7 +145,8 @@
         });
     }
 
-    setInterval(update, 2000);
+    document.addEventListener("DOMContentLoaded", update);
+    setInterval(update, 1000);
   </script>
 </body>
 

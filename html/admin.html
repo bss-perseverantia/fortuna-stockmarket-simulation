@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet" />
-    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet" />
+    <link href="/static/tailwind.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
     <title>Fortuna - Admin</title>
 
@@ -70,11 +70,238 @@
                 transform: scale(0.9);
             }
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+
+        .modal-content {
+            background-color: #1f2937;
+            margin: 5vh auto;
+            padding: 1.5rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            color: white;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid #374151;
+            position: relative;
+        }
+
+        @media (max-width: 640px) {
+            .modal-content {
+                margin: 2vh auto;
+                padding: 1rem;
+                width: 95%;
+                max-height: 95vh;
+            }
+        }
+
+        .close {
+            color: #9ca3af;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #fff;
+        }
+
+        /* Action Button Container */
+        .action-button-group {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        /* Base Action Button Styles */
+        .action-btn {
+            flex: 1;
+            padding: 1rem 2rem;
+            border: 2px solid;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 700;
+            font-size: 1rem;
+            text-align: center;
+            user-select: none;
+            position: relative;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Buy Button Styles */
+        .buy-action-btn {
+            background-color: #1f2937;
+            border-color: #10b981;
+            color: #10b981;
+        }
+
+        .buy-action-btn:hover {
+            background-color: rgba(16, 185, 129, 0.15);
+            border-color: #059669;
+            color: #059669;
+            transform: translateY(-2px);
+        }
+
+        .buy-action-btn.active {
+            background-color: #10b981;
+            border-color: #10b981;
+            color: white;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.7);
+        }
+
+        /* Sell Button Styles */
+        .sell-action-btn {
+            background-color: #1f2937;
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
+        .sell-action-btn:hover {
+            background-color: rgba(239, 68, 68, 0.15);
+            border-color: #dc2626;
+            color: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .sell-action-btn.active {
+            background-color: #ef4444;
+            border-color: #ef4444;
+            color: white;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.7);
+        }
+
+        /* Hidden Radio Inputs */
+        .action-btn input[type="radio"] {
+            display: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 640px) {
+            .action-button-group {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .action-btn {
+                padding: 0.875rem 1.5rem;
+                font-size: 0.95rem;
+            }
+        }        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #d1d5db;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            background-color: #374151;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 0;
+        }
+
+        @media (max-width: 640px) {
+            .btn-group {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .btn {
+                flex: none;
+                padding: 0.75rem 1rem;
+            }
+        }
+
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-secondary {
+            background-color: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
     </style>
 </head>
 
 <body class="bg-blue-900 text-white font-['IBM_Plex_Mono'] text-base">
     <script>
+        if (localStorage.getItem("u") && localStorage.getItem("p")) {
+            let u = localStorage.getItem("u");
+            let p = localStorage.getItem("p");
+            fetch(`/adminauth?u=${u}&p=${p}`)
+                .then((x) => x.json())
+                .then((d) => {
+                    if (!d.data) {
+                        localStorage.removeItem("u");
+                        localStorage.removeItem("p");
+                        window.location.href = "/";
+                    }
+                });
+            } else {
         let u = prompt("Username");
         let p = prompt("Password");
         fetch(`/adminauth?u=${u}&p=${p}`)
@@ -87,12 +314,13 @@
                     window.location.href = "/";
                 }
             });
+        }
     </script>
 
     <div class="flex flex-col items-center p-4">
         <div class="bg-gray-900 w-full max-w-screen-lg rounded-xl p-4 sm:p-6 md:p-8">
             <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-4 hidden">
                     <span>Trade Time:</span>
                     <label class="switch">
                         <input type="checkbox" id="sw" />
@@ -109,7 +337,7 @@
                 <select id="revise-prices" class="w-full sm:w-auto px-4 py-2 rounded-md text-black"></select>
             </div>
             
-            <div class="flex items-center gap-4 mb-6">
+            <div class="flex items-center gap-4 mb-6 hidden">
                 <span>Make Prices White</span>
                 <label class="switch">
                     <input type="checkbox" id="white-btn" />
@@ -141,6 +369,7 @@
                             <th class="px-4 py-2">Investment Value</th>
                             <th class="px-4 py-2">Portfolio Value</th>
                             <th class="px-4 py-2">Net Profit/Loss</th>
+                            <th class="px-4 py-2">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="schools"></tbody>
@@ -153,6 +382,60 @@
         </footer>
     </div>
 
+    <!-- Portfolio Management Modal -->
+    <div id="portfolioModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">Manage Portfolio</h2>
+            
+            <div class="form-group">
+                <label>Account:</label>
+                <div id="modalAccountInfo" class="text-lg font-semibold text-blue-300"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Current Cash:</label>
+                <div id="modalCashInfo" class="text-lg font-semibold text-green-400"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Action:</label>
+                <div class="action-button-group">
+                    <div class="action-btn buy-action-btn" onclick="selectNewAction('buy')">
+                        <input type="radio" name="action" value="buy" id="buyRadio">
+                        BUY SHARES
+                    </div>
+                    <div class="action-btn sell-action-btn" onclick="selectNewAction('sell')">
+                        <input type="radio" name="action" value="sell" id="sellRadio">
+                        SELL SHARES
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="stockSelect">Select Stock:</label>
+                <select id="stockSelect">
+                    <option value="">-- Choose a stock --</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="quantityInput">Number of Shares:</label>
+                <input type="number" id="quantityInput" min="1" placeholder="Enter quantity">
+            </div>
+
+            <div class="form-group">
+                <label>Current Holdings:</label>
+                <div id="currentHoldings" class="text-sm text-gray-300"></div>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="executeTransaction()">Execute Transaction</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             var checkbox = document.getElementById("sw");
@@ -163,8 +446,12 @@
                     .then((x) => x.json())
                     .then((d) => {
                         if (d.data !== "success") {
-                            checkbox.checked = false;
+                            whiteBtn.checked = !whiteBtn.checked;
                         }
+                    })
+                    .catch((error) => {
+                        console.error("Error toggling white prices:", error);
+                        whiteBtn.checked = !whiteBtn.checked;
                     });
             });
 
@@ -176,6 +463,10 @@
                         if (d.data !== "success") {
                             checkbox.checked = !checkbox.checked;
                         }
+                    })
+                    .catch((error) => {
+                        console.error("Error toggling trade time:", error);
+                        checkbox.checked = !checkbox.checked;
                     });
             });
         });
@@ -226,6 +517,7 @@
                         stockHTML += `<tr><td class="px-4 py-2">${sp[i].name}</td><td class="px-4 py-2">${sp[i].price}</td><td class="px-4 py-2"><button onclick='change("${sp[i].name}")' class='bg-orange-600 rounded-xl px-4 py-2'>Change</button></td></tr>`;
                     }
 
+                    // Calculate net profit/loss for each school and sort
                     sd.forEach((school) => {
                         let totalStockValue = 0.0;
                         school.stocks.forEach((stockQty, index) => {
@@ -234,65 +526,285 @@
                         school.netProfitLoss = school.cash + totalStockValue - 1000000;
                     });
 
+                    // Sort schools by net profit/loss (descending)
                     sd.sort((a, b) => b.netProfitLoss - a.netProfitLoss);
 
-
-                        let s = sd[i].stocks;
-                        let totalStockValue = s.reduce((sum, qty, j) => sum + qty * db.stockprices[j].price, 0);
-                        let netProfitLoss = sd[i].cash + totalStockValue - 1000000;
-
+                    // Generate school HTML
+                    sd.forEach((school) => {
+                        let totalStockValue = 0.0;
+                        school.stocks.forEach((stockQty, index) => {
+                            totalStockValue += stockQty * db.stockprices[index].price;
+                        });
+                        let netProfitLoss = school.netProfitLoss;
                         schoolHTML += `<tr>
-                            <td class="px-4 py-2">${sd[i].schoolcode}</td>
-                            <td class="px-4 py-2">₹ ${sd[i].cash.toLocaleString("hi")}</td>
+                            <td class="px-4 py-2">${school.schoolcode}</td>
+                            <td class="px-4 py-2">₹ ${school.cash.toLocaleString("hi")}</td>
                             <td class="px-4 py-2">₹ ${totalStockValue.toLocaleString("hi")}</td>
-                            <td class="px-4 py-2">₹ ${(sd[i].cash + totalStockValue).toLocaleString("hi")}</td>
+                            <td class="px-4 py-2">₹ ${(school.cash + totalStockValue).toLocaleString("hi")}</td>
                             <td class="px-4 py-2 text-${netProfitLoss < 0 ? "red" : "green"}-500">₹ ${netProfitLoss.toLocaleString("hi")}</td>
+                            <td class="px-4 py-2">
+                                <button onclick='openPortfolioModal("${school.schoolcode}")' class='bg-blue-600 hover:bg-blue-700 rounded-xl px-3 py-1 text-white text-sm transition-all'>
+                                    Change Portfolio
+                                </button>
+                            </td>
                         </tr>`;
-                    }
+                    });
 
                     document.getElementById("stocks").innerHTML = stockHTML;
                     document.getElementById("schools").innerHTML = schoolHTML;
+
+                    // Store current data globally for modal use
+                    window.currentData = db;
+                })
+                .catch((error) => {
+                    console.error("Error updating data:", error);
                 });
         }
 
-        fetch("/data")
-        .then(res => res.json())
-        .then(data => {
-            const dropdown = document.getElementById("revise-prices");
-            const allPrices = data.allPrices;
-
-            for (let i = 0; i < allPrices.length-1; i++) {
-                const option = document.createElement("option");
-                option.value = i;
-                option.text = i === 0 ? "Original" : `Revised #${i}`;
-                dropdown.appendChild(option);
-            }
-
-            // Attach onchange after populating
-            dropdown.addEventListener("change", function () {
-                revisePrices(this.value);
-            });
-        });
-
-
-        
-
-        setInterval(update, 2000);
-
         function change(stock) {
             let v = parseFloat(prompt("The stock value for " + stock + " should be:"));
+            if (isNaN(v) || v <= 0) {
+                alert("Please enter a valid positive number.");
+                return;
+            }
             fetch(`/setSP?value=${v}&u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}&n=${escape(stock)}`)
                 .then((x) => x.json())
-                .then((d) => alert(d.data === "success" ? "Success!" : "Failed."));
+                .then((d) => alert(d.data === "success" ? "Success!" : "Failed."))
+                .catch((error) => {
+                    console.error("Error changing stock price:", error);
+                    alert("Error occurred while changing stock price.");
+                });
         }
 
         function resetDb() {
             if (confirm("Are you sure you want to reset the database?")) {
                 fetch(`/resetDB?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`)
                     .then((x) => x.json())
-                    .then((d) => alert(d.data === "success" ? "Success!" : "Failed."));
+                    .then((d) => alert(d.data === "success" ? "Success!" : "Failed."))
+                    .catch((error) => {
+                        console.error("Error resetting database:", error);
+                        alert("Error occurred while resetting database.");
+                    });
             }
         }
+
+        // Initialize dropdown and start updates when page loads
+        document.addEventListener("DOMContentLoaded", function() {
+            // First call update to populate the page
+            update();
+            
+            // Fetch account credentials for portfolio management
+            fetchAccountCredentials();
+            
+            // Set up the interval
+            setInterval(update, 2000);
+            
+            // Setup dropdown
+            fetch("/data")
+                .then(res => res.json())
+                .then(data => {
+                    const dropdown = document.getElementById("revise-prices");
+                    const allPrices = data.allPrices;
+
+                    for (let i = 0; i < allPrices.length-1; i++) {
+                        const option = document.createElement("option");
+                        option.value = i;
+                        option.text = i === 0 ? "Original" : `Revised #${i}`;
+                        dropdown.appendChild(option);
+                    }
+
+                    // Attach onchange after populating
+                    dropdown.addEventListener("change", function () {
+                        revisePrices(this.value);
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error setting up dropdown:", error);
+                });
+        });
+
+        // Modal Functions
+        let currentSchool = null;
+        let accountCredentials = {};
+
+        // Fetch account credentials when page loads
+        function fetchAccountCredentials() {
+            fetch(`/getAllAccounts?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data !== 'false') {
+                        // Store credentials for easy lookup
+                        data.forEach(account => {
+                            accountCredentials[account.username] = account.password;
+                        });
+                        console.log('Account credentials loaded successfully');
+                    } else {
+                        console.error('Failed to fetch account credentials');
+                        alert('Failed to load account credentials. Portfolio management may not work.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching account credentials:', error);
+                    alert('Error loading account credentials. Portfolio management may not work.');
+                });
+        }
+
+        function openPortfolioModal(schoolCode) {
+            currentSchool = schoolCode;
+            const modal = document.getElementById('portfolioModal');
+            const schoolData = window.currentData.schooldata.find(s => s.schoolcode === schoolCode);
+            
+            if (!schoolData) {
+                alert('School data not found');
+                return;
+            }
+
+            // Update modal content
+            document.getElementById('modalAccountInfo').textContent = schoolCode;
+            document.getElementById('modalCashInfo').textContent = `₹ ${schoolData.cash.toLocaleString("hi")}`;
+            
+            // Populate stock dropdown
+            const stockSelect = document.getElementById('stockSelect');
+            stockSelect.innerHTML = '<option value="">-- Choose a stock --</option>';
+            window.currentData.stockprices.forEach((stock, index) => {
+                stockSelect.innerHTML += `<option value="${index}">${stock.name} - ₹${stock.price.toLocaleString("hi")}</option>`;
+            });
+
+            // Update current holdings
+            updateCurrentHoldings();
+            
+            // Reset form
+            document.getElementById('quantityInput').value = '';
+            document.querySelectorAll('input[name="action"]').forEach(radio => radio.checked = false);
+            document.querySelectorAll('.action-btn').forEach(btn => btn.classList.remove('active'));
+            
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('portfolioModal').style.display = 'none';
+            currentSchool = null;
+        }
+
+        // New action selection function for the redesigned buttons
+        function selectNewAction(action) {
+            // Remove active class from all action buttons
+            document.querySelectorAll('.action-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to the selected button
+            document.querySelector(`.${action}-action-btn`).classList.add('active');
+            
+            // Set the radio button
+            document.getElementById(action + 'Radio').checked = true;
+        }
+
+        function selectAction(action) {
+            document.querySelectorAll('.radio-option').forEach(option => option.classList.remove('selected'));
+            document.querySelector(`.radio-option.${action}`).classList.add('selected');
+            document.getElementById(action + 'Radio').checked = true;
+        }
+
+        function updateCurrentHoldings() {
+            if (!currentSchool || !window.currentData) return;
+            
+            const schoolData = window.currentData.schooldata.find(s => s.schoolcode === currentSchool);
+            const holdingsDiv = document.getElementById('currentHoldings');
+            
+            let holdingsHTML = '';
+            schoolData.stocks.forEach((quantity, index) => {
+                if (quantity > 0) {
+                    const stock = window.currentData.stockprices[index];
+                    holdingsHTML += `<div>${stock.name}: ${quantity} shares (₹${(stock.price * quantity).toLocaleString("hi")})</div>`;
+                }
+            });
+            
+            if (holdingsHTML === '') {
+                holdingsHTML = '<div class="text-gray-500">No current holdings</div>';
+            }
+            
+            holdingsDiv.innerHTML = holdingsHTML;
+        }
+
+        function executeTransaction() {
+            const action = document.querySelector('input[name="action"]:checked');
+            const stockIndex = document.getElementById('stockSelect').value;
+            const quantity = parseInt(document.getElementById('quantityInput').value);
+            
+            if (!action) {
+                alert('Please select Buy or Sell');
+                return;
+            }
+            
+            if (!stockIndex || stockIndex === '') {
+                alert('Please select a stock');
+                return;
+            }
+            
+            if (!quantity || quantity <= 0) {
+                alert('Please enter a valid quantity');
+                return;
+            }
+
+            // Check if we have the account credentials
+            if (!accountCredentials[currentSchool]) {
+                alert('Account credentials not found. Please refresh the page and try again.');
+                return;
+            }
+
+            const stock = window.currentData.stockprices[stockIndex];
+            const schoolData = window.currentData.schooldata.find(s => s.schoolcode === currentSchool);
+            
+            // Use real account credentials for authentication
+            const realAuth = currentSchool + '_' + accountCredentials[currentSchool];
+            
+            const endpoint = action.value === 'buy' ? '/buyStock' : '/sellStock';
+            const url = `${endpoint}?school=${encodeURIComponent(realAuth)}&stock=${encodeURIComponent(stock.name)}&n=${quantity}`;
+            
+            // Show confirmation
+            const actionText = action.value === 'buy' ? 'buy' : 'sell';
+            const totalCost = stock.price * quantity;
+            const confirmMessage = `${actionText.toUpperCase()} ${quantity} shares of ${stock.name} for ₹${totalCost.toLocaleString("hi")}?`;
+            
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Transaction failed: ' + data.error);
+                    } else {
+                        alert(`Transaction successful! New quantity: ${data.newQuantity}`);
+                        updateCurrentHoldings();
+                        // Refresh the main page data
+                        update();
+                        // Close the modal on successful transaction
+                        closeModal();
+                    }
+                })
+                .catch(error => {
+                    console.error('Transaction error:', error);
+                    alert('Transaction failed due to network error');
+                });
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('portfolioModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Close modal when pressing Escape
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        document.querySelector('.close').onclick = closeModal;
     </script>
 </body>
 

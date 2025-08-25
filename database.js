@@ -63,11 +63,14 @@ class Database {
     const stockIndex = db.schooldata[schoolIndex].stocks.findIndex(
         (stock, index) => stockname === db.stockprices[index].name,
     );
-    console.log(db.stockprices[stockIndex]);
     if (db.schooldata[schoolIndex].cash >
         (db.stockprices[stockIndex].price) * n) {
       db.schooldata[schoolIndex].stocks[stockIndex] += n;
       db.schooldata[schoolIndex].cash -= (db.stockprices[stockIndex].price) * n;
+      // Price goes UP when bought
+      let p = Number(db.stockprices[stockIndex].price);
+      p = parseFloat((p + 0.01 * p * (n/10)).toFixed(2));
+      db.stockprices[stockIndex].price = p.toFixed(2);
       fs.writeFileSync('./database.json', JSON.stringify(db));
     }
     return db.schooldata[schoolIndex].stocks[stockIndex];
@@ -84,6 +87,10 @@ class Database {
     if (db.schooldata[schoolIndex].stocks[stockIndex] >= n) {
       db.schooldata[schoolIndex].stocks[stockIndex] -= n;
       db.schooldata[schoolIndex].cash += (db.stockprices[stockIndex].price) * n;
+      // Price goes DOWN when sold
+      db.stockprices[stockIndex].price = parseFloat(
+        (db.stockprices[stockIndex].price - 0.01 * db.stockprices[stockIndex].price * (n/10)).toFixed(2)
+      );
       fs.writeFileSync('./database.json', JSON.stringify(db));
     }
     return db.schooldata[schoolIndex].stocks[stockIndex];

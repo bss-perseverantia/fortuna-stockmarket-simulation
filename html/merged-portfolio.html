@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" href="fortuna.png" type="image/x-icon" />
+  <link rel="stylesheet" href="/fonts.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link href="/static/tailwind.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css" />
+  <title>Fortuna - Portfolio Dashboard</title>
+  
+  <style>
+    /* Admin Theme Styling */
+    body {
+      background-color: #1e3a8a;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    /* Main Container */
+    .main-container {
+      background-color: #111827;
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      border: 1px solid #374151;
+    }
+
+    /* Cash Display */
+    .cash-display {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      padding: 1.5rem 2.5rem;
+      border-radius: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 700;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    /* Portfolio Cards */
+    .portfolio-card {
+      background-color: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .portfolio-card:hover {
+      border-color: #3b82f6;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Section Titles */
+    .section-title {
+      color: #f9fafb;
+      font-weight: 700;
+    }
+
+    /* Stock Table */
+    .stock-table {
+      background-color: #1f2937;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .stock-table th {
+      background-color: #374151;
+      color: #f9fafb;
+      padding: 1rem;
+      font-weight: 600;
+      border-bottom: 2px solid #4b5563;
+    }
+
+    .stock-table td {
+      background-color: #1f2937;
+      color: #e5e7eb;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #374151;
+    }
+
+    .stock-table tr:hover td {
+      background-color: #374151;
+    }
+
+    /* Stock Items */
+    .stock-item {
+      background-color: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      color: #e5e7eb;
+    }
+
+    .stock-item:hover {
+      border-color: #3b82f6;
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+      transform: translateY(-2px);
+    }
+
+    /* Chart Container */
+    .chart-container {
+      background-color: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #1f2937;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #374151;
+      border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4b5563;
+    }
+
+    /* Footer Styling */
+    .footer-admin {
+      background-color: #000000;
+      border-top: 1px solid #374151;
+    }
+
+    /* Notification Styles */
+    .notification-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      max-width: 400px;
+      pointer-events: none;
+    }
+
+    .notification {
+      background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+      border: 1px solid #4b5563;
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+      animation: slideIn 0.3s ease-out;
+      pointer-events: auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .notification.buy {
+      border-left: 4px solid #10b981;
+    }
+
+    .notification.sell {
+      border-left: 4px solid #ef4444;
+    }
+
+    .notification-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .notification-title {
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .notification.buy .notification-title {
+      color: #10b981;
+    }
+
+    .notification.sell .notification-title {
+      color: #ef4444;
+    }
+
+    .notification-close {
+      background: none;
+      border: none;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 0;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .notification-close:hover {
+      color: #fff;
+    }
+
+    .notification-body {
+      color: #e5e7eb;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .notification-details {
+      margin-top: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+
+    .notification.removing {
+      animation: slideOut 0.3s ease-in forwards;
+    }
+
+    @media (max-width: 640px) {
+      .notification-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+      }
+
+      .notification {
+        margin-bottom: 8px;
+        padding: 0.875rem 1.25rem;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-blue-900 text-white font-['IBM_Plex_Mono'] text-base">
+  <div class="min-h-screen flex flex-col">
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <div class="flex flex-col p-4 sm:p-6">
+      <div class="mb-6 flex justify-center">
+        <div id="moneydiv" class="cash-display">
+          <span>Cash: ₹</span><span id="cash"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="flex justify-center px-4">
+      <div class="chart-container p-6 w-full max-w-5xl">
+        <div class="w-full h-[50vh] sm:h-[60vh]">
+          <canvas id="myChart" class="rounded-xl w-full h-full"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stock Holdings Section -->
+    <div class="px-4 sm:px-8 mt-6">
+      <div class="portfolio-card p-6 w-full max-w-5xl mx-auto">
+        <h1 class="text-2xl sm:text-3xl font-bold text-center mb-6 section-title">Stock Holdings</h1>
+        <ul id="stock-list" class="list-none p-0 w-full"></ul>
+        
+        <!-- Stock Prices Table - positioned before portfolio summary -->
+        <div class="mt-8 mb-6" id="stock-prices-section">
+          <h2 class="text-xl sm:text-2xl font-bold text-center mb-4 section-title">Current Stock Prices</h2>
+          <div class="stock-table">
+            <div class="overflow-x-auto">
+              <table id="stocks" class="w-full table-auto text-sm sm:text-base">
+                <thead>
+                  <tr>
+                    <th class="px-4 py-3">Sector</th>
+                    <th class="px-4 py-3">Name</th>
+                    <th class="px-4 py-3">Price</th>
+                    <th class="px-4 py-3">Qty Owned</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Portfolio Summary -->
+        <div id="portfolio-summary"></div>
+      </div>
+    </div>
+
+    <footer class="footer-admin mt-8 py-4 text-center rounded-t-2xl">
+      <span class="text-white font-bold">Perseverantia © 2024</span>
+    </footer>
+  </div>
+
+  <script>
+    let xValues = [];
+    let yValues = [];
+    let gtt = [];
+    let l = Array(20).fill(0);
+    let colors = Array(20).fill("white");
+    const ctx = document.getElementById("myChart");
+
+    // Notification system variables
+    let previousStockHoldings = {};
+    let isFirstLoad = true;
+
+    Chart.defaults.backgroundColor = "#60a5fa";
+    Chart.defaults.borderColor = "#93c5fd";
+    Chart.defaults.color = "#ffffff";
+
+    let stockChart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: xValues,
+        datasets: [
+          {
+            label: "# of shares",
+            data: yValues,
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+
+    // Notification Functions
+    function showNotification(type, stockName, quantity, price, school) {
+      const container = document.getElementById('notification-container');
+      const notification = document.createElement('div');
+      
+      const actionText = type === 'buy' ? 'BOUGHT' : 'SOLD';
+      const totalValue = quantity * price;
+      
+      notification.className = `notification ${type}`;
+      notification.innerHTML = `
+        <div class="notification-header">
+          <span class="notification-title">${actionText}</span>
+          <button class="notification-close" onclick="removeNotification(this)">&times;</button>
+        </div>
+        <div class="notification-body">
+          <strong>${school}</strong> ${type === 'buy' ? 'purchased' : 'sold'} <strong>${quantity}</strong> shares of <strong>${stockName}</strong>
+        </div>
+        <div class="notification-details">
+          <span>Price: ₹${price.toLocaleString("hi")}</span>
+          <span>Total: ₹${totalValue.toLocaleString("hi")}</span>
+        </div>
+      `;
+      
+      container.appendChild(notification);
+      
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        removeNotification(notification.querySelector('.notification-close'));
+      }, 5000);
+    }
+
+    function removeNotification(closeButton) {
+      const notification = closeButton.closest('.notification');
+      notification.classList.add('removing');
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 300);
+    }
+
+    function detectStockChanges(currentHoldings, stockPrices, schoolCode) {
+      if (isFirstLoad) {
+        // Store initial holdings and skip notifications on first load
+        previousStockHoldings = { ...currentHoldings };
+        isFirstLoad = false;
+        return;
+      }
+
+      // Check for changes in stock holdings
+      for (let i = 0; i < currentHoldings.length; i++) {
+        const currentQty = currentHoldings[i];
+        const previousQty = previousStockHoldings[i] || 0;
+        
+        if (currentQty !== previousQty) {
+          const stockName = stockPrices[i].name;
+          const stockPrice = stockPrices[i].price;
+          const difference = currentQty - previousQty;
+          
+          if (difference > 0) {
+            // Stock was bought
+            showNotification('buy', stockName, difference, stockPrice, schoolCode);
+          } else if (difference < 0) {
+            // Stock was sold
+            showNotification('sell', stockName, Math.abs(difference), stockPrice, schoolCode);
+          }
+        }
+      }
+
+      // Update previous holdings
+      previousStockHoldings = { ...currentHoldings };
+    }
+
+    function update() {
+      fetch("/data")
+        .then((x) => x.json())
+        .then((x) => {
+          let db = x;
+          let sp = db.stockprices;
+          const ssid = document.cookie.split("=")[1].split("_")[0];
+          let si = db.schooldata.findIndex((schoolData) => schoolData.schoolcode === ssid);
+          let currentcash = parseFloat(db.schooldata[si].cash);
+
+          // Detect stock changes for notifications
+          if (db.schooldata[si].stocks) {
+            detectStockChanges(db.schooldata[si].stocks, sp, ssid);
+          }
+
+          // Update cash display
+          document.getElementById("cash").innerHTML = currentcash.toLocaleString("hi");
+
+          // Update chart data
+          xValues = db.stockprices.map((x) => x.name);
+          yValues = db.schooldata[si].stocks;
+
+          while (yValues.indexOf(0) !== -1) {
+            let i = yValues.indexOf(0);
+            yValues.splice(i, 1);
+            xValues.splice(i, 1);
+          }
+
+          // Update stock prices table (from index.html logic)
+          let matching = -1;
+          for (let i = 0; i < db.allPrices.length; i++) {
+            let matches = true;
+            for (let j = 0; j < db.allPrices[i].length; j++) {
+              if (sp[j].price !== db.allPrices[i][j]) {
+                matches = false;
+                break;
+              }
+            }
+            if (matches) {
+              matching = i;
+              break;
+            }
+          }
+
+          let d = "";
+          const tableBody = document.querySelector("#stocks tbody");
+
+          for (let i = 0; i < sp.length; i++) {
+            let col = "white";
+            if (matching > 0 && !db.whitePrices) {
+              if (db.allPrices[matching][i] > db.allPrices[matching - 1][i]) col = "green";
+              else if (db.allPrices[matching][i] < db.allPrices[matching - 1][i]) col = "red";
+            } else if (matching === -1) {
+              if (l[i] > sp[i].price) col = "red";
+              else if (l[i] < sp[i].price) col = "green";
+              else col = colors[i];
+              l[i] = sp[i].price;
+              colors[i] = col;
+              if (!db.tradetime) col = "white";
+            }
+
+            d += `
+              <tr style="background: ${i % 2 === 0 ? 'rgba(8, 16, 50, 0.6)' : 'rgba(12, 21, 66, 0.6)'}; transition: all 0.3s ease;">
+                <td class="px-2 py-1" style="color: #ccc;">${sp[i].sector}</td>
+                <td class="px-2 py-1" style="color: #fff; font-weight: 600;">${sp[i].name}</td>
+                <td class="px-2 py-1 text-${col}-400" id="sp${i}" style="font-weight: bold;">${sp[i].price.toLocaleString("hi")}</td>
+                <td class="px-2 py-1" style="color: #fff; font-weight: 600;">${db.schooldata[si].stocks[i]}</td>
+              </tr>`;
+          }
+
+          tableBody.innerHTML = d;
+
+          // Update portfolio holdings
+          const stockList = document.getElementById("stock-list");
+          let stats_html = "";
+          let totalinvstocks = 0;
+
+          for (let i = 0; i < yValues.length; ++i) {
+            let profit = db.stockprices.find((s) => s.name === xValues[i]).price * yValues[i];
+            totalinvstocks += profit;
+
+            stats_html += `
+              <li class="stock-item border rounded-lg mb-4 p-4 flex justify-between items-center">
+                <span class="font-semibold" style="color: #fff;">${xValues[i]}</span>
+                <span class="text-lg" style="color: #fff; font-weight: 600;">₹${profit.toLocaleString("hi")}</span>
+              </li>`;
+          }
+
+          const networth = totalinvstocks + currentcash;
+          const profitloss = networth - 1000000;
+          const netColor = networth > 1000000 ? "green" : "red";
+
+          // Update portfolio summary (positioned after stock prices table)
+          const portfolioSummary = document.getElementById("portfolio-summary");
+          portfolioSummary.innerHTML = `
+            <hr class="w-full my-6" style="border-color: rgba(190, 142, 48, 0.4); border-width: 2px;">
+            <h2 class="text-xl sm:text-2xl font-bold text-center mb-4 section-title">Portfolio Summary</h2>
+            <ul class="list-none p-0 w-full">
+              <li class="stock-item border rounded-lg mb-4 p-4 flex justify-between items-center">
+                <span class="font-semibold" style="color: #fff;">TOTAL INVESTED IN STOCKS:</span>
+                <span class="text-lg" style="color: #fff; font-weight: 600;">₹${totalinvstocks.toLocaleString("hi")}</span>
+              </li>
+              <li class="stock-item border rounded-lg mb-4 p-4 flex justify-between items-center">
+                <span class="font-semibold" style="color: #fff;">Standby Cash:</span>
+                <span class="text-lg" style="color: #fff; font-weight: 600;">₹${currentcash.toLocaleString("hi")}</span>
+              </li>
+              <li class="stock-item border rounded-lg mb-4 p-4 flex justify-between items-center">
+                <span class="font-semibold" style="color: #fff;">NET WORTH:</span>
+                <span class="text-lg" style="color: ${netColor === 'green' ? '#4ade80' : '#ef4444'}; font-weight: 600;">₹${networth.toLocaleString("hi")}</span>
+              </li>
+              <li class="stock-item border rounded-lg mb-4 p-4 flex justify-between items-center">
+                <span class="font-semibold" style="color: #fff;">NET <span style="color: #4ade80;">PROFIT</span>/<span style="color: #ef4444;">LOSS</span>:</span>
+                <span class="text-lg" style="color: ${netColor === 'green' ? '#4ade80' : '#ef4444'}; font-weight: 600;">₹${profitloss.toLocaleString("hi")}</span>
+              </li>
+            </ul>`;
+
+          stockList.innerHTML = stats_html;
+
+          stockChart.data.labels = xValues;
+          stockChart.data.datasets[0].data = yValues;
+          stockChart.update();
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", update);
+    setInterval(update, 1000);
+
+    
+  </script>
+</body>
+
+</html>

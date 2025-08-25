@@ -2,19 +2,19 @@ module.exports = {
   cash: 1000000,
   stockprices: [
   {
-    "name": "MG Motors",
+    "name": "Aarav Motors",
     "price": 1000,
-    "sector": "Automobile"
+    "sector": "Automobiles"
   },
   {
-    "name": "Infosys",
-    "price": 2540,
+    "name": "Aarav F1 Team",
+    "price": 1500,
+    "sector": "Sports"
+  },
+  {
+    "name": "Aarav Laptop Servicing",
+    "price": 300,
     "sector": "IT"
-  },
-  {
-    "name": "Reliance Power",
-    "price": 700,
-    "sector": "Electricity"
   }
 ]
 };
