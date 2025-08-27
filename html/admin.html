@@ -782,11 +782,22 @@
         }
 
         function update() {
-            fetch("/data")
-                .then((x) => x.json())
-                .then((db) => {
-                    document.getElementById("sw").checked = db.tradetime;
-                    document.getElementById("white-btn").checked = db.whitePrices;
+            // Use cached data from WebSocket if available, otherwise fetch
+            if (window.currentData && window.isConnected) {
+                updateDisplay(window.currentData);
+            } else {
+                fetch("/data")
+                    .then((x) => x.json())
+                    .then((db) => {
+                        window.currentData = db;
+                        updateDisplay(db);
+                    });
+            }
+        }
+
+        function updateDisplay(db) {
+            document.getElementById("sw").checked = db.tradetime;
+            document.getElementById("white-btn").checked = db.whitePrices;
 
                     let sp = db.stockprices;
                     let sd = db.schooldata;
@@ -849,12 +860,35 @@
                     document.getElementById("stocks").innerHTML = stockHTML;
                     document.getElementById("schools").innerHTML = schoolHTML;
 
+                    // Populate revise prices dropdown
+                    fetch(`/getAllPrices?u=${localStorage.getItem("u")}&p=${localStorage.getItem("p")}`)
+                        .then((x) => x.json())
+                        .then((allPrices) => {
+                            const reviseSelect = document.getElementById('revise-prices');
+                            if (reviseSelect && Array.isArray(allPrices)) {
+                                reviseSelect.innerHTML = '<option value="">Select Revision</option>';
+                                allPrices.forEach((priceArray, index) => {
+                                    const option = document.createElement('option');
+                                    option.value = index;
+                                    option.textContent = `Revision ${index + 1}`;
+                                    reviseSelect.appendChild(option);
+                                });
+                                
+                                // Add event listener for revision selection
+                                reviseSelect.onchange = function() {
+                                    if (this.value !== '') {
+                                        revisePrices(this.value);
+                                        this.value = ''; // Reset selection
+                                    }
+                                };
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("Error loading price revisions:", error);
+                        });
+
                     // Store current data globally for modal use
                     window.currentData = db;
-                })
-                .catch((error) => {
-                    console.error("Error updating data:", error);
-                });
         }
 
         function change(stock) {
@@ -905,7 +939,7 @@
             }
         }
 
-        // Initialize dropdown and start updates when page loads
+                // Initialize dropdown and start updates when page loads
         document.addEventListener("DOMContentLoaded", function() {
             // First call update to populate the page
             update();
@@ -913,32 +947,69 @@
             // Fetch account credentials for portfolio management
             fetchAccountCredentials();
             
-            // Set up the interval
-            setInterval(update, 2000);
+            // Connect to WebSocket for real-time updates
+            connectWebSocket();
             
-            // Setup dropdown
-            fetch("/data")
-                .then(res => res.json())
-                .then(data => {
-                    const dropdown = document.getElementById("revise-prices");
-                    const allPrices = data.allPrices;
+            // Fallback: if WebSocket fails, use polling
+            setTimeout(() => {
+                if (!window.isConnected) {
+                    console.log('WebSocket connection failed, falling back to polling');
+                    setInterval(update, 2000);
+                }
+            }, 5000);
+            
 
-                    for (let i = 0; i < allPrices.length-1; i++) {
-                        const option = document.createElement("option");
-                        option.value = i;
-                        option.text = i === 0 ? "Original" : `Revised #${i}`;
-                        dropdown.appendChild(option);
-                    }
-
-                    // Attach onchange after populating
-                    dropdown.addEventListener("change", function () {
-                        revisePrices(this.value);
-                    });
-                })
-                .catch((error) => {
-                    console.error("Error setting up dropdown:", error);
-                });
         });
+
+        // WebSocket connection for admin panel
+        let adminWs = null;
+        window.isConnected = false;
+
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}`;
+            
+            console.log('Admin connecting to WebSocket:', wsUrl);
+            
+            adminWs = new WebSocket(wsUrl);
+
+            adminWs.onopen = function() {
+                console.log('Admin WebSocket connected');
+                window.isConnected = true;
+            };
+
+            adminWs.onmessage = function(event) {
+                try {
+                    const message = JSON.parse(event.data);
+                    if (message.type === 'data' && message.payload) {
+                        updateWithData(message.payload);
+                    }
+                } catch (error) {
+                    console.error('Error parsing WebSocket message:', error);
+                }
+            };
+
+            adminWs.onclose = function() {
+                console.log('Admin WebSocket disconnected');
+                window.isConnected = false;
+                
+                // Attempt to reconnect every 5 seconds
+                setTimeout(() => {
+                    console.log('Admin attempting to reconnect...');
+                    connectWebSocket();
+                }, 5000);
+            };
+
+            adminWs.onerror = function(error) {
+                console.error('Admin WebSocket error:', error);
+                window.isConnected = false;
+            };
+        }
+
+        function updateWithData(data) {
+            window.currentData = data;
+            update();
+        }
 
         // Modal Functions
         let currentSchool = null;

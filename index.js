@@ -4,9 +4,78 @@ const {spawn} = require('child_process');
 const db = new Database();
 const express = require('express');
 const app = express();
-app.listen(3000, () => {
+const http = require('http');
+const WebSocket = require('ws');
+
+// Create HTTP server
+const server = http.createServer(app);
+
+// Create WebSocket server
+const wss = new WebSocket.Server({ server });
+
+// Store connected clients
+const clients = new Set();
+
+// WebSocket connection handling
+wss.on('connection', (ws) => {
+  console.log('New WebSocket client connected');
+  clients.add(ws);
+
+  // Send initial data to new client
+  const initialData = getCurrentData();
+  ws.send(JSON.stringify({
+    type: 'data',
+    payload: initialData
+  }));
+
+  // Handle client disconnect
+  ws.on('close', () => {
+    console.log('WebSocket client disconnected');
+    clients.delete(ws);
+  });
+
+  // Handle errors
+  ws.on('error', (error) => {
+    console.error('WebSocket error:', error);
+    clients.delete(ws);
+  });
+});
+
+// Function to get current data
+function getCurrentData() {
+  let path = './database.json';
+  delete require.cache[require.resolve(path)];
+  let d = require(path);
+  d.tradetime = tradetime;
+  return d;
+}
+
+// Function to broadcast data to all connected clients
+function broadcastData() {
+  if (clients.size === 0) return;
+
+  const data = getCurrentData();
+  const message = JSON.stringify({
+    type: 'data',
+    payload: data
+  });
+
+  clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(message);
+    } else {
+      clients.delete(client);
+    }
+  });
+}
+
+// Broadcast data every second
+setInterval(broadcastData, 1000);
+
+server.listen(3000, () => {
   console.log('App ready!');
 });
+
 let bodyParser = require('body-parser');
 let crypto = require('crypto');
 let cookies = require('cookie-parser');
@@ -127,11 +196,8 @@ app.post('/login', (req, res) => {
 });
 
 app.get('/data', (req, res) => {
-  let path = './database.json';
-  delete require.cache[require.resolve(path)];
-  let d = require(path);
-  d.tradetime = tradetime;
-  return res.status(200).json(d);
+  const data = getCurrentData();
+  return res.status(200).json(data);
 });
 
 app.get('/getAllPrices', (req, res) => {

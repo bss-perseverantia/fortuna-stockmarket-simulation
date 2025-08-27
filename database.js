@@ -88,7 +88,7 @@ class Database {
     }
     db.stockprices[stockIndex].stocksbought += n;
     
-    // Calculate price impact based on market dynamics
+    // Calculate price impact based on market dynamics (reduced impact)
     let p = Number(db.stockprices[stockIndex].price);
     
     // Market demand ratio (how much of total stock is already bought)
@@ -97,17 +97,17 @@ class Database {
     // Volume impact (larger purchases have more impact)
     const volumeImpact = n / db.stockprices[stockIndex].totalStock;
     
-    // Base impact rate (starts at 0.5% for low demand, scales up to 2% for high demand)
-    const baseImpactRate = 0.005 + (demandRatio * 0.015);
+    // Reduced base impact rate (starts at 0.2% for low demand, scales up to 0.8% for high demand)
+    const baseImpactRate = 0.002 + (demandRatio * 0.006);
     
-    // Volume multiplier (larger trades have exponentially more impact)
-    const volumeMultiplier = 1 + Math.pow(volumeImpact * 100, 0.7);
+    // Reduced volume multiplier (much smaller exponential impact)
+    const volumeMultiplier = 1 + Math.pow(volumeImpact * 50, 0.5);
     
-    // Scarcity multiplier (prices rise faster when more stock is already bought)
-    const scarcityMultiplier = 1 + (demandRatio * 2);
+    // Reduced scarcity multiplier (gentler price increases)
+    const scarcityMultiplier = 1 + (demandRatio * 0.8);
     
-    // Final impact calculation
-    const priceImpact = baseImpactRate * volumeMultiplier * scarcityMultiplier;
+    // Final impact calculation with overall dampener
+    const priceImpact = baseImpactRate * volumeMultiplier * scarcityMultiplier * 0.6;
     
     // Apply the price increase
     p = parseFloat((p * (1 + priceImpact)).toFixed(2));
