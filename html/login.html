@@ -1,71 +1,340 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <meta content='width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;' name='viewport' />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="fortuna.png" type="image/x-icon">
-    <meta name="viewport" content="width=device-width" />
-    <link rel="stylesheet" href="/fonts.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link href="/static/tailwind.min.css" rel="stylesheet" />
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <title>Fortuna - Login</title>
 
-    <title>School Login</title>
+    <style>
+        :root {
+            --primary-dark: #0f172a;
+            --secondary-dark: #1e293b;
+            --tertiary-dark: #334155;
+            --navy-dark: #0c1426;
+            --navy-medium: #1a2332;
+            --navy-light: #2d3748;
+            --gold-primary: #f59e0b;
+            --gold-secondary: #d97706;
+            --gold-light: #fbbf24;
+            --gold-accent: #92400e;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #475569;
+            --success: #10b981;
+            --danger: #ef4444;
+            --glass-bg: rgba(30, 41, 59, 0.8);
+            --glass-border: rgba(148, 163, 184, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--navy-dark) 0%, var(--primary-dark) 50%, var(--navy-medium) 100%) !important;
+            font-family: 'Inter', sans-serif !important;
+            color: var(--text-primary) !important;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .glass-morphism {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-secondary));
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-secondary) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
+        }
+
+        .app-title {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .app-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 1rem 2rem;
+            border: 2px solid var(--gold-primary);
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+            color: var(--gold-primary);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .login-button:hover {
+            background: var(--gold-primary);
+            color: var(--primary-dark);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            background: var(--glass-bg);
+            border: 2px solid var(--danger);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-top: 1rem;
+            color: var(--danger);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .fortuna-bg {
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            width: 120px;
+            height: 120px;
+            opacity: 0.1;
+            background-image: url('/fortuna.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        @media (max-width: 640px) {
+            .login-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .app-title {
+                font-size: 1.75rem;
+            }
+
+            .logo-icon {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
 </head>
 
-<body class="bg-blue-900 w-screen flex items-center justify-center">
-    <div class="mx-8 lg:w-1/3 flex items-center justify-center">
-        <div class=" bg-gray-900 rounded-xl p-1 mt-4 bgimg block items-center justify-center">
-            <div class="mx-8 my-8 ">
-                <div class="bg-gray-800 w-full rounded-xl p-8 text-center text-white"
-                    style="font-family: 'Yahoo Sans Finance', Arial, Helvetica, sans-serif; font-weight: 600; font-size: 2rem;">
-                    Login</div>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="login-container">
+        <div class="fortuna-bg"></div>
+        
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <div class="logo-icon">
+                <i data-lucide="crown" class="w-8 h-8 text-white"></i>
             </div>
-
-            <div>
-                <form method="post" action="/login" class="block items-center justify-center px-48 py-32">
-                    <input type="text" name="username" placeholder="School Code...."
-                        class="p-2 opacity-75 bg-gray-800 rounded-lg border-solid border-white border-2" />
-                    <br><br>
-                    <input type="password" name="password" placeholder="Password...."
-                        class="p-2 opacity-75 bg-gray-800 rounded-lg border-solid border-white border-2" />
-                    <br><br>
-                    <div class="px-16"><button type="submit"
-                            class="p-2 bg-blue-800 opacity-75 hover:opacity-50 hover-shadow-xx l rounded-lg border-solid border-white border-2">Submit</button>
-                    </div>
-                </form>
-                <script>
-                    if (new URLSearchParams(location.search).get("error")) {
-                        document.body.innerHTML += new URLSearchParams(location.search).get("error");
-                    }
-                </script>
-            </div>
+            <h1 class="app-title">Fortuna</h1>
+            <p class="app-subtitle">Stock Market Simulation</p>
         </div>
 
+        <!-- Login Form -->
+        <form method="post" action="/login" class="space-y-6">
+            <div class="form-group">
+                <label for="username" class="form-label">School Code</label>
+                <input 
+                    type="text" 
+                    id="username"
+                    name="username" 
+                    placeholder="Enter your school code"
+                    class="form-input"
+                    required
+                />
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Password</label>
+                <input 
+                    type="password" 
+                    id="password"
+                    name="password" 
+                    placeholder="Enter your password"
+                    class="form-input"
+                    required
+                />
+            </div>
+
+            <button type="submit" class="login-button">
+                <i data-lucide="log-in" class="w-5 h-5"></i>
+                <span>Sign In</span>
+            </button>
+        </form>
+
+        <!-- Error Message Container -->
+        <div id="error-container"></div>
     </div>
 
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Handle error display
+        if (new URLSearchParams(location.search).get("error")) {
+            const errorContainer = document.getElementById("error-container");
+            const errorMessage = new URLSearchParams(location.search).get("error");
+            
+            errorContainer.innerHTML = `
+                <div class="error-message">
+                    <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                    <span>${errorMessage}</span>
+                </div>
+            `;
+            
+            // Re-initialize icons for the error message
+            lucide.createIcons();
+        }
+
+        // Add form validation and enhanced UX
+        const form = document.querySelector('form');
+        const submitButton = document.querySelector('.login-button');
+        
+        form.addEventListener('submit', function(e) {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !password) {
+                e.preventDefault();
+                
+                const errorContainer = document.getElementById("error-container");
+                errorContainer.innerHTML = `
+                    <div class="error-message">
+                        <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                        <span>Please fill in all fields</span>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+            
+            // Show loading state
+            submitButton.innerHTML = `
+                <i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i>
+                <span>Signing In...</span>
+            `;
+            submitButton.disabled = true;
+            lucide.createIcons();
+        });
+
+        // Input focus effects
+        const inputs = document.querySelectorAll('.form-input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentNode.style.transform = 'translateY(-2px)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentNode.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
 </body>
-<style>
-    .bgimg {
-        background-repeat: no-repeat;
-        background-position: bottom;
-
-        background-image: url('/fortuna.png');
-    }
-
-    html,
-    body {
-        overflow-x: hidden;
-    }
-
-    body {
-        position: relative;
-    }
-</style>
 
 </html>

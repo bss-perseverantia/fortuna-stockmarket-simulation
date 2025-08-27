@@ -51,7 +51,14 @@ app.get('/sellStock', async (req, res) => {
     let ps = acc[i].password;
 
     if (un == school && ps == req.query.school.split('_')[1]) {
-      return res.json({newQuantity: db.sellStock(school, stock, n)});
+      const result = db.sellStock(school, stock, n);
+      // Handle new response format from database
+      if (typeof result === 'object' && result.success !== undefined) {
+        return res.json(result);
+      } else {
+        // Legacy response format (just a number)
+        return res.json({newQuantity: result});
+      }
     }
   }
   return res.json({error: 'Invalid Auth'});
@@ -70,7 +77,14 @@ app.get('/buyStock', async (req, res) => {
     let ps = acc[i].password;
 
     if (un == school && ps == req.query.school.split('_')[1]) {
-      return res.json({newQuantity: db.buyStock(school, stock, n)});
+      const result = db.buyStock(school, stock, n);
+      // Handle new response format from database
+      if (typeof result === 'object' && result.success !== undefined) {
+        return res.json(result);
+      } else {
+        // Legacy response format (just a number)
+        return res.json({newQuantity: result});
+      }
     }
   }
   return res.json({error: 'Invalid Auth'});

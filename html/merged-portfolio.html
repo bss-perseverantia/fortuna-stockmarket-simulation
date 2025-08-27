@@ -5,140 +5,199 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="shortcut icon" href="fortuna.png" type="image/x-icon" />
-  <link rel="stylesheet" href="/fonts.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="/static/tailwind.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   <title>Fortuna - Portfolio Dashboard</title>
   
   <style>
-    /* Admin Theme Styling */
+    :root {
+      --primary-dark: #0f172a;
+      --secondary-dark: #1e293b;
+      --tertiary-dark: #334155;
+      --navy-dark: #0c1426;
+      --navy-medium: #1a2332;
+      --navy-light: #2d3748;
+      --gold-primary: #f59e0b;
+      --gold-secondary: #d97706;
+      --gold-light: #fbbf24;
+      --gold-accent: #92400e;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --border-color: #475569;
+      --success: #10b981;
+      --danger: #ef4444;
+      --glass-bg: rgba(30, 41, 59, 0.8);
+      --glass-border: rgba(148, 163, 184, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      background-color: #1e3a8a;
-      font-family: 'IBM Plex Mono', monospace;
+      background: linear-gradient(135deg, var(--navy-dark) 0%, var(--primary-dark) 50%, var(--navy-medium) 100%);
+      font-family: 'Inter', sans-serif;
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    /* Main Container */
-    .main-container {
-      background-color: #111827;
-      border-radius: 16px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-      border: 1px solid #374151;
+    .glass-morphism {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     }
 
-    /* Cash Display */
-    .cash-display {
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: white;
-      padding: 1.5rem 2.5rem;
+    .gold-gradient {
+      background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-secondary) 100%);
+    }
+
+    .glow-effect {
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+    }
+
+    .hover-lift {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .hover-lift:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin: 0.75rem 0;
+    }
+
+    @media (max-width: 1024px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
+    }
+
+    .chart-container {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
       border-radius: 12px;
-      font-family: 'IBM Plex Mono', monospace;
-      font-weight: 700;
-      font-size: 1.5rem;
-      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-      border: 1px solid rgba(16, 185, 129, 0.2);
+      padding: 0.75rem;
+      height: 280px;
+      overflow: hidden;
     }
 
-    /* Portfolio Cards */
-    .portfolio-card {
-      background-color: #1f2937;
-      border: 1px solid #374151;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-      transition: all 0.3s ease;
+    .holdings-container {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 0.75rem;
+      max-height: 280px;
+      overflow-y: auto;
     }
 
-    .portfolio-card:hover {
-      border-color: #3b82f6;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-    }
-
-    /* Section Titles */
-    .section-title {
-      color: #f9fafb;
-      font-weight: 700;
-    }
-
-    /* Stock Table */
-    .stock-table {
-      background-color: #1f2937;
+    .modern-table {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
       border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      margin: 0.75rem 0;
     }
 
-    .stock-table th {
-      background-color: #374151;
-      color: #f9fafb;
-      padding: 1rem;
-      font-weight: 600;
-      border-bottom: 2px solid #4b5563;
+    .modern-table table {
+      table-layout: fixed;
+      width: 100%;
     }
 
-    .stock-table td {
-      background-color: #1f2937;
-      color: #e5e7eb;
-      padding: 0.75rem 1rem;
-      border-bottom: 1px solid #374151;
+    .modern-table th,
+    .modern-table td {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .stock-table tr:hover td {
-      background-color: #374151;
+    .modern-table th:nth-child(1),
+    .modern-table td:nth-child(1) { width: 15%; } /* Sector */
+    .modern-table th:nth-child(2),
+    .modern-table td:nth-child(2) { width: 25%; } /* Company */
+    .modern-table th:nth-child(3),
+    .modern-table td:nth-child(3) { width: 20%; } /* Price */
+    .modern-table th:nth-child(4),
+    .modern-table td:nth-child(4) { width: 12%; } /* Owned */
+    .modern-table th:nth-child(5),
+    .modern-table td:nth-child(5) { width: 13%; } /* % Owned */
+    .modern-table th:nth-child(6),
+    .modern-table td:nth-child(6) { width: 15%; } /* Available */
+
+    .table-header {
+      background: linear-gradient(135deg, var(--tertiary-dark) 0%, var(--secondary-dark) 100%);
+      border-bottom: 2px solid var(--gold-primary);
     }
 
-    /* Stock Items */
-    .stock-item {
-      background-color: #1f2937;
-      border: 1px solid #374151;
-      border-radius: 12px;
+    .table-row {
+      border-bottom: 1px solid var(--glass-border);
       transition: all 0.3s ease;
-      color: #e5e7eb;
     }
 
-    .stock-item:hover {
-      border-color: #3b82f6;
-      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
-      transform: translateY(-2px);
+    .table-row:hover {
+      background: rgba(245, 158, 11, 0.1);
+      transform: scale(1.01);
     }
 
-    /* Chart Container */
-    .chart-container {
-      background-color: #1f2937;
-      border: 1px solid #374151;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    .holding-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      transition: all 0.3s ease;
     }
 
-    /* Scrollbar Styling */
-    ::-webkit-scrollbar {
-      width: 12px;
+    .holding-card:hover {
+      border-color: var(--gold-primary);
+      box-shadow: 0 8px 25px rgba(245, 158, 11, 0.2);
     }
 
-    ::-webkit-scrollbar-track {
-      background: #1f2937;
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
+      margin: 0.75rem 0;
     }
 
-    ::-webkit-scrollbar-thumb {
-      background: #374151;
-      border-radius: 6px;
+    .stat-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
     }
 
-    ::-webkit-scrollbar-thumb:hover {
-      background: #4b5563;
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--gold-primary), var(--gold-secondary));
     }
 
-    /* Footer Styling */
-    .footer-admin {
-      background-color: #000000;
-      border-top: 1px solid #374151;
-    }
-
-    /* Notification Styles */
     .notification-container {
       position: fixed;
       top: 20px;
@@ -149,25 +208,24 @@
     }
 
     .notification {
-      background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
-      border: 1px solid #4b5563;
-      border-radius: 12px;
-      padding: 1rem 1.5rem;
-      margin-bottom: 10px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(10px);
-      animation: slideIn 0.3s ease-out;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       pointer-events: auto;
       position: relative;
       overflow: hidden;
     }
 
     .notification.buy {
-      border-left: 4px solid #10b981;
+      border-left: 4px solid var(--success);
     }
 
     .notification.sell {
-      border-left: 4px solid #ef4444;
+      border-left: 4px solid var(--danger);
     }
 
     .notification-header {
@@ -183,148 +241,266 @@
     }
 
     .notification.buy .notification-title {
-      color: #10b981;
+      color: var(--success);
     }
 
     .notification.sell .notification-title {
-      color: #ef4444;
+      color: var(--danger);
     }
 
     .notification-close {
       background: none;
       border: none;
-      color: #9ca3af;
+      color: var(--text-muted);
       cursor: pointer;
       font-size: 1.2rem;
-      padding: 0;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: all 0.2s ease;
     }
 
     .notification-close:hover {
-      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
     }
 
     .notification-body {
-      color: #e5e7eb;
+      color: var(--text-secondary);
       font-size: 0.85rem;
-      line-height: 1.4;
+      line-height: 1.6;
     }
 
     .notification-details {
-      margin-top: 0.5rem;
+      margin-top: 0.75rem;
       display: flex;
       justify-content: space-between;
       font-size: 0.8rem;
-      color: #9ca3af;
+      color: var(--text-muted);
     }
 
     @keyframes slideIn {
       from {
-        transform: translateX(100%);
+        transform: translateX(100%) scale(0.8);
         opacity: 0;
       }
       to {
-        transform: translateX(0);
+        transform: translateX(0) scale(1);
         opacity: 1;
       }
     }
 
     @keyframes slideOut {
       from {
-        transform: translateX(0);
+        transform: translateX(0) scale(1);
         opacity: 1;
       }
       to {
-        transform: translateX(100%);
+        transform: translateX(100%) scale(0.8);
         opacity: 0;
       }
     }
 
     .notification.removing {
-      animation: slideOut 0.3s ease-in forwards;
+      animation: slideOut 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
 
-    @media (max-width: 640px) {
-      .notification-container {
-        top: 10px;
-        right: 10px;
-        left: 10px;
-        max-width: none;
+    .footer-modern {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--glass-border);
+      margin-top: 1rem;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .price-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+    }
+
+    .price-up {
+      background: var(--success);
+      box-shadow: 0 0 10px var(--success);
+    }
+
+    .price-down {
+      background: var(--danger);
+      box-shadow: 0 0 10px var(--danger);
+    }
+
+    .price-neutral {
+      background: var(--text-muted);
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-light) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .section-title {
+        font-size: 1rem;
+      }
+      
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
+      
+      .summary-stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
       }
 
-      .notification {
-        margin-bottom: 8px;
-        padding: 0.875rem 1.25rem;
+      .chart-container, .holdings-container {
+        height: 220px;
+        padding: 0.5rem;
+      }
+
+      /* Mobile table adjustments */
+      .modern-table {
+        overflow-x: auto;
+      }
+
+      .modern-table table {
+        table-layout: auto;
+        min-width: 600px;
+      }
+
+      .modern-table th,
+      .modern-table td {
+        white-space: nowrap;
+        width: auto;
       }
     }
   </style>
 </head>
 
-<body class="bg-blue-900 text-white font-['IBM_Plex_Mono'] text-base">
-  <div class="min-h-screen flex flex-col">
-    <!-- Notification Container -->
-    <div id="notification-container" class="notification-container"></div>
+<body class="min-h-screen">
+  <!-- Notification Container -->
+  <div id="notification-container" class="notification-container"></div>
+  <footer class="footer-modern">
+    <div class="flex items-center justify-center gap-2">
+      <i data-lucide="crown" class="w-5 h-5" style="color: var(--gold-primary);"></i>
+      <span class="font-semibold" style="color: var(--text-primary);">Fortuna Dashboard</span>
+    </div>
+  </footer>
 
-    <div class="flex flex-col p-4 sm:p-6">
-      <div class="mb-6 flex justify-center">
-        <div id="moneydiv" class="cash-display">
-          <span>Cash: ₹</span><span id="cash"></span>
+  <div class="container mx-auto px-4 py-2">
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid">
+      <!-- Chart Section -->
+      <div class="chart-container hover-lift hidden md:block">
+        <div class="flex items-center gap-2 mb-2">
+          <i data-lucide="bar-chart-3" class="w-4 h-4" style="color: var(--gold-primary);"></i>
+          <h2 class="section-title text-sm mb-0">Holdings Distribution</h2>
         </div>
+        <div class="h-56">
+          <canvas id="myChart" class="w-full h-full rounded-lg"></canvas>
+        </div>
+      </div>
+
+      <!-- Current Holdings -->
+      <div class="holdings-container hover-lift scrollbar-hide">
+        <div class="flex items-center gap-2 mb-2">
+          <i data-lucide="portfolio" class="w-4 h-4" style="color: var(--gold-primary);"></i>
+          <h2 class="section-title text-sm mb-0">Current Holdings</h2>
+        </div>
+        <div id="stock-list" class="space-y-1"></div>
       </div>
     </div>
 
-    <!-- Chart Section -->
-    <div class="flex justify-center px-4">
-      <div class="chart-container p-6 w-full max-w-5xl">
-        <div class="w-full h-[50vh] sm:h-[60vh]">
-          <canvas id="myChart" class="rounded-xl w-full h-full"></canvas>
+    <!-- Stock Prices Table -->
+    <div class="modern-table hover-lift">
+      <div class="px-3 py-2 border-b border-gray-600">
+        <div class="flex items-center gap-2">
+          <i data-lucide="trending-up" class="w-4 h-4" style="color: var(--gold-primary);"></i>
+          <h2 class="section-title text-sm mb-0">Live Market Prices</h2>
         </div>
+      </div>
+      <div class="table-wrapper">
+        <table id="stocks" class="w-full">
+          <thead class="table-header">
+            <tr>
+              <th class="px-3 py-2 text-left font-semibold text-xs" title="Sector">Sector</th>
+              <th class="px-3 py-2 text-left font-semibold text-xs" title="Company">Company</th>
+              <th class="px-3 py-2 text-left font-semibold text-xs" title="Price">Price</th>
+              <th class="px-3 py-2 text-left font-semibold text-xs" title="Owned">Owned</th>
+              <th class="px-3 py-2 text-left font-semibold text-xs" title="% Owned">% Owned</th>
+              <th class="px-3 py-2 text-left font-semibold text-xs" title="Available">Available</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
     </div>
 
-    <!-- Stock Holdings Section -->
-    <div class="px-4 sm:px-8 mt-6">
-      <div class="portfolio-card p-6 w-full max-w-5xl mx-auto">
-        <h1 class="text-2xl sm:text-3xl font-bold text-center mb-6 section-title">Stock Holdings</h1>
-        <ul id="stock-list" class="list-none p-0 w-full"></ul>
-        
-        <!-- Stock Prices Table - positioned before portfolio summary -->
-        <div class="mt-8 mb-6" id="stock-prices-section">
-          <h2 class="text-xl sm:text-2xl font-bold text-center mb-4 section-title">Current Stock Prices</h2>
-          <div class="stock-table">
-            <div class="overflow-x-auto">
-              <table id="stocks" class="w-full table-auto text-sm sm:text-base">
-                <thead>
-                  <tr>
-                    <th class="px-4 py-3">Sector</th>
-                    <th class="px-4 py-3">Name</th>
-                    <th class="px-4 py-3">Price</th>
-                    <th class="px-4 py-3">Qty Owned</th>
-                    <th class="px-4 py-3">% owned</th>
-                    <th class="px-4 py-3">Available</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div>
-          </div>
+    <!-- Portfolio Summary Stats -->
+    <div class="summary-stats">
+      <div class="stat-card hover-lift">
+        <div class="flex items-center justify-center gap-1 mb-1">
+          <i data-lucide="trending-up" class="w-4 h-4" style="color: var(--gold-primary);"></i>
+          <h3 class="text-sm font-semibold" style="color: var(--text-secondary);">Total Invested</h3>
         </div>
-        
-        <!-- Portfolio Summary -->
-        <div id="portfolio-summary"></div>
+        <div id="total-invested" class="text-lg font-bold" style="color: var(--text-primary);">₹0</div>
+      </div>
+
+      <div class="stat-card hover-lift">
+        <div class="flex items-center justify-center gap-1 mb-1">
+          <i data-lucide="piggy-bank" class="w-4 h-4" style="color: var(--gold-primary);"></i>
+          <h3 class="text-sm font-semibold" style="color: var(--text-secondary);">Standby Cash</h3>
+        </div>
+        <div id="standby-cash" class="text-lg font-bold" style="color: var(--text-primary);">₹0</div>
+      </div>
+
+      <div class="stat-card hover-lift">
+        <div class="flex items-center justify-center gap-1 mb-1">
+          <i data-lucide="target" class="w-4 h-4" style="color: var(--gold-primary);"></i>
+          <h3 class="text-sm font-semibold" style="color: var(--text-secondary);">Net Worth</h3>
+        </div>
+        <div id="net-worth" class="text-lg font-bold">₹0</div>
+      </div>
+
+      <div class="stat-card hover-lift">
+        <div class="flex items-center justify-center gap-1 mb-1">
+          <i data-lucide="activity" class="w-4 h-4" style="color: var(--gold-primary);"></i>
+          <h3 class="text-sm font-semibold" style="color: var(--text-secondary);">P&L</h3>
+        </div>
+        <div id="profit-loss" class="text-lg font-bold">₹0</div>
       </div>
     </div>
-
-    <footer class="footer-admin mt-8 py-4 text-center rounded-t-2xl">
-      <span class="text-white font-bold">Perseverantia © 2024</span>
-    </footer>
   </div>
 
+  <!-- Footer -->
+  <footer class="footer-modern">
+    <div class="flex items-center justify-center gap-2">
+      <i data-lucide="crown" class="w-5 h-5" style="color: var(--gold-primary);"></i>
+      <span class="font-semibold" style="color: var(--text-primary);">Perseverantia © 2024</span>
+    </div>
+  </footer>
+
   <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
     let xValues = [];
     let yValues = [];
     let gtt = [];
@@ -336,18 +512,43 @@
     let previousStockHoldings = {};
     let isFirstLoad = true;
 
-    Chart.defaults.backgroundColor = "#60a5fa";
-    Chart.defaults.borderColor = "#93c5fd";
-    Chart.defaults.color = "#ffffff";
+    // Chart.js configuration for modern dark theme
+    Chart.defaults.backgroundColor = "rgba(245, 158, 11, 0.8)";
+    Chart.defaults.borderColor = "rgba(245, 158, 11, 1)";
+    Chart.defaults.color = "#f8fafc";
 
     let stockChart = new Chart(ctx, {
-      type: "bar",
+      type: "doughnut",
       data: {
         labels: xValues,
         datasets: [
           {
-            label: "# of shares",
+            label: "Holdings Value",
             data: yValues,
+            backgroundColor: [
+              "rgba(245, 158, 11, 0.8)",
+              "rgba(217, 119, 6, 0.8)",
+              "rgba(251, 191, 36, 0.8)",
+              "rgba(146, 64, 14, 0.8)",
+              "rgba(245, 158, 11, 0.6)",
+              "rgba(217, 119, 6, 0.6)",
+              "rgba(251, 191, 36, 0.6)",
+              "rgba(146, 64, 14, 0.6)",
+              "rgba(245, 158, 11, 0.4)",
+              "rgba(217, 119, 6, 0.4)"
+            ],
+            borderColor: [
+              "rgba(245, 158, 11, 1)",
+              "rgba(217, 119, 6, 1)",
+              "rgba(251, 191, 36, 1)",
+              "rgba(146, 64, 14, 1)",
+              "rgba(245, 158, 11, 1)",
+              "rgba(217, 119, 6, 1)",
+              "rgba(251, 191, 36, 1)",
+              "rgba(146, 64, 14, 1)",
+              "rgba(245, 158, 11, 1)",
+              "rgba(217, 119, 6, 1)"
+            ],
             borderWidth: 1,
           },
         ],
@@ -355,11 +556,52 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
+        layout: {
+          padding: 5
         },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 10,
+              font: {
+                size: 10,
+                family: 'Inter'
+              },
+              color: '#f8fafc',
+              boxWidth: 12,
+              boxHeight: 12
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(30, 41, 59, 0.95)',
+            titleColor: '#f8fafc',
+            bodyColor: '#cbd5e1',
+            borderColor: 'rgba(245, 158, 11, 0.5)',
+            borderWidth: 1,
+            cornerRadius: 8,
+            titleFont: {
+              size: 11
+            },
+            bodyFont: {
+              size: 10
+            },
+            callbacks: {
+              label: function(context) {
+                const value = context.parsed;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${context.label}: ₹${value.toLocaleString("hi")} (${percentage}%)`;
+              }
+            }
+          }
+        },
+        cutout: '60%',
+        elements: {
+          arc: {
+            borderRadius: 4
+          }
+        }
       },
     });
 
@@ -370,12 +612,18 @@
       
       const actionText = type === 'buy' ? 'BOUGHT' : 'SOLD';
       const totalValue = quantity * price;
+      const icon = type === 'buy' ? 'trending-up' : 'trending-down';
       
       notification.className = `notification ${type}`;
       notification.innerHTML = `
         <div class="notification-header">
-          <span class="notification-title">${actionText}</span>
-          <button class="notification-close" onclick="removeNotification(this)">&times;</button>
+          <div class="flex items-center gap-2">
+            <i data-lucide="${icon}" class="w-4 h-4"></i>
+            <span class="notification-title">${actionText}</span>
+          </div>
+          <button class="notification-close" onclick="removeNotification(this)">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
         </div>
         <div class="notification-body">
           <strong>${school}</strong> ${type === 'buy' ? 'purchased' : 'sold'} <strong>${quantity}</strong> shares of <strong>${stockName}</strong>
@@ -387,6 +635,9 @@
       `;
       
       container.appendChild(notification);
+      
+      // Re-initialize icons for the new notification
+      lucide.createIcons();
       
       // Auto-remove after 10 seconds
       setTimeout(() => {
@@ -401,7 +652,7 @@
         if (notification.parentNode) {
           notification.parentNode.removeChild(notification);
         }
-      }, 300);
+      }, 400);
     }
 
     function detectStockChanges(currentHoldings, stockPrices, schoolCode) {
@@ -451,20 +702,21 @@
             detectStockChanges(db.schooldata[si].stocks, sp, ssid);
           }
 
-          // Update cash display
-          document.getElementById("cash").innerHTML = currentcash.toLocaleString("hi");
-
           // Update chart data
           xValues = db.stockprices.map((x) => x.name);
-          yValues = db.schooldata[si].stocks;
+          yValues = db.schooldata[si].stocks.map((qty, i) => qty * sp[i].price);
 
-          while (yValues.indexOf(0) !== -1) {
-            let i = yValues.indexOf(0);
-            yValues.splice(i, 1);
-            xValues.splice(i, 1);
+          // Filter out zero values for chart
+          let filteredXValues = [];
+          let filteredYValues = [];
+          for (let i = 0; i < yValues.length; i++) {
+            if (yValues[i] > 0) {
+              filteredXValues.push(xValues[i]);
+              filteredYValues.push(yValues[i]);
+            }
           }
 
-          // Update stock prices table (from index.html logic)
+          // Update stock prices table
           let matching = -1;
           for (let i = 0; i < db.allPrices.length; i++) {
             let matches = true;
@@ -480,91 +732,125 @@
             }
           }
 
-          let d = "";
+          let tableHTML = "";
           const tableBody = document.querySelector("#stocks tbody");
 
           for (let i = 0; i < sp.length; i++) {
-            let col = "white";
+            let priceColor = "var(--text-primary)";
+            let indicatorClass = "price-neutral";
+            
             if (matching > 0 && !db.whitePrices) {
-              if (db.allPrices[matching][i] > db.allPrices[matching - 1][i]) col = "green";
-              else if (db.allPrices[matching][i] < db.allPrices[matching - 1][i]) col = "red";
+              if (db.allPrices[matching][i] > db.allPrices[matching - 1][i]) {
+                priceColor = "var(--success)";
+                indicatorClass = "price-up";
+              } else if (db.allPrices[matching][i] < db.allPrices[matching - 1][i]) {
+                priceColor = "var(--danger)";
+                indicatorClass = "price-down";
+              }
             } else if (matching === -1) {
-              if (l[i] > sp[i].price) col = "red";
-              else if (l[i] < sp[i].price) col = "green";
-              else col = colors[i];
+              if (l[i] > sp[i].price) {
+                priceColor = "var(--danger)";
+                indicatorClass = "price-down";
+              } else if (l[i] < sp[i].price) {
+                priceColor = "var(--success)";
+                indicatorClass = "price-up";
+              }
               l[i] = sp[i].price;
-              colors[i] = col;
-              if (!db.tradetime) col = "white";
+              if (!db.tradetime) {
+                priceColor = "var(--text-primary)";
+                indicatorClass = "price-neutral";
+              }
             }
-            d += `
-              <tr style="background: ${i % 2 === 0 ? 'rgba(8, 16, 50, 0.6)' : 'rgba(12, 21, 66, 0.6)'}; transition: all 0.3s ease;">
-                <td class="px-2 py-1" style="color: #ccc;">${sp[i].sector}</td>
-                <td class="px-2 py-1" style="color: #fff; font-weight: 600;">${sp[i].name}</td>
-                <td class="px-2 py-1 text-${col}-400" id="sp${i}" style="font-weight: bold;">${sp[i].price.toLocaleString("hi")}</td>
-                <td class="px-2 py-1" style="color: #fff; font-weight: 600;">${db.schooldata[si].stocks[i]}</td>
-                <td class="px-2 py-1" style="color: #fff; font-weight: 600;">${(db.schooldata[si].stocks[i] / db.stockprices[i].totalStock * 100).toFixed(2)}</td>
-                <td class="px-2 py-1" style="color: #fff; font-weight: 600;">${db.stockprices[i].totalStock}</td>
+
+            const ownedPercentage = (db.schooldata[si].stocks[i] / sp[i].totalStock * 100).toFixed(2);
+            
+            tableHTML += `
+              <tr class="table-row">
+                <td class="px-3 py-1 text-xs" style="color: var(--text-secondary);">${sp[i].sector}</td>
+                <td class="px-3 py-1 text-xs font-semibold" style="color: var(--text-primary);">${sp[i].name}</td>
+                <td class="px-3 py-1 text-xs font-bold" style="color: ${priceColor};">
+                  <div class="flex items-center gap-1">
+                    <span class="price-indicator ${indicatorClass}"></span>
+                    ₹${sp[i].price.toLocaleString("hi")}
+                  </div>
+                </td>
+                <td class="px-3 py-1 text-xs font-semibold" style="color: var(--text-primary);">${db.schooldata[si].stocks[i]}</td>
+                <td class="px-3 py-1 text-xs" style="color: var(--gold-primary);">${ownedPercentage}%</td>
+                <td class="px-3 py-1 text-xs" style="color: var(--text-secondary);">${(sp[i].totalStock-db.stockprices[i].stocksbought).toLocaleString("hi")}</td>
               </tr>`;
           }
 
-          tableBody.innerHTML = d;
+          tableBody.innerHTML = tableHTML;
 
-          // Update portfolio holdings
+          // Update holdings list
           const stockList = document.getElementById("stock-list");
-          let stats_html = "";
-          let totalinvstocks = 0;
+          let holdingsHTML = "";
+          let totalInvestment = 0; // Amount invested at purchase price
 
-          for (let i = 0; i < yValues.length; ++i) {
-            let profit = db.stockprices.find((s) => s.name === xValues[i]).price * yValues[i];
-            totalinvstocks += profit;
-
-            stats_html += `
-              <li class="stock-item border rounded-lg mb-4 p-4 flex justify-between items-center">
-                <span class="font-semibold" style="color: #fff;">${xValues[i]}</span>
-                <span class="text-lg" style="color: #fff; font-weight: 600;">₹${profit.toLocaleString("hi")}</span>
-              </li>`;
+          for (let i = 0; i < sp.length; i++) {
+            const qty = db.schooldata[si].stocks[i];
+            if (qty > 0) {
+              const investedValue = (db.stockprices[i].lastBoughtPrice || sp[i].price) * qty;
+              totalInvestment += investedValue;
+              
+              holdingsHTML += `
+                <div class="holding-card">
+                  <div class="flex justify-between items-center">
+                    <div>
+                      <div class="font-semibold text-sm" style="color: var(--text-primary);">${sp[i].name}</div>
+                      <div class="text-xs" style="color: var(--text-secondary);">${qty} shares • ${sp[i].sector}</div>
+                    </div>
+                    <div class="text-right">
+                      <div class="font-bold text-sm" style="color: var(--gold-primary);">₹${investedValue.toLocaleString("hi")}</div>
+                      <div class="text-xs" style="color: var(--text-muted);">₹${(db.stockprices[i].lastBoughtPrice || sp[i].price).toLocaleString("hi")}/share</div>
+                    </div>
+                  </div>
+                </div>`;
+            }
           }
 
-          const networth = totalinvstocks + currentcash;
-          const profitloss = networth - 1000000;
-          const netColor = networth > 1000000 ? "green" : "red";
+          if (holdingsHTML === "") {
+            holdingsHTML = `
+              <div class="text-center py-4">
+                <i data-lucide="portfolio" class="w-8 h-8 mx-auto mb-2 opacity-50" style="color: var(--text-muted);"></i>
+                <p class="text-xs" style="color: var(--text-muted);">No holdings yet</p>
+              </div>`;
+          }
 
-          // Update portfolio summary (positioned after stock prices table)
-          const portfolioSummary = document.getElementById("portfolio-summary");
-          portfolioSummary.innerHTML = `
-            <hr class="w-full my-6" style="border-color: rgba(190, 142, 48, 0.4); border-width: 2px;">
-            <h2 class="text-xl sm:text-2xl font-bold text-center mb-4 section-title">Portfolio Summary</h2>
-            <ul class="list-none p-0 w-full">
-              <li class="stock-item border rounded-lg mb-4 p-4 flex justify-between items-center">
-                <span class="font-semibold" style="color: #fff;">TOTAL INVESTED IN STOCKS:</span>
-                <span class="text-lg" style="color: #fff; font-weight: 600;">₹${totalinvstocks.toLocaleString("hi")}</span>
-              </li>
-              <li class="stock-item border rounded-lg mb-4 p-4 flex justify-between items-center">
-                <span class="font-semibold" style="color: #fff;">Standby Cash:</span>
-                <span class="text-lg" style="color: #fff; font-weight: 600;">₹${currentcash.toLocaleString("hi")}</span>
-              </li>
-              <li class="stock-item border rounded-lg mb-4 p-4 flex justify-between items-center">
-                <span class="font-semibold" style="color: #fff;">NET WORTH:</span>
-                <span class="text-lg" style="color: ${netColor === 'green' ? '#4ade80' : '#ef4444'}; font-weight: 600;">₹${networth.toLocaleString("hi")}</span>
-              </li>
-              <li class="stock-item border rounded-lg mb-4 p-4 flex justify-between items-center">
-                <span class="font-semibold" style="color: #fff;">NET <span style="color: #4ade80;">PROFIT</span>/<span style="color: #ef4444;">LOSS</span>:</span>
-                <span class="text-lg" style="color: ${netColor === 'green' ? '#4ade80' : '#ef4444'}; font-weight: 600;">₹${profitloss.toLocaleString("hi")}</span>
-              </li>
-            </ul>`;
+          stockList.innerHTML = holdingsHTML;
 
-          stockList.innerHTML = stats_html;
+          // Update summary stats
+          const networth = totalInvestment + currentcash; // Invested amount + cash
+          const profitloss = networth - 1000000; // Total portfolio vs starting amount
+          const isProfit = profitloss >= 0;
 
-          stockChart.data.labels = xValues;
-          stockChart.data.datasets[0].data = yValues;
+          document.getElementById("total-invested").textContent = `₹${totalInvestment.toLocaleString("hi")}`;
+          document.getElementById("standby-cash").textContent = `₹${currentcash.toLocaleString("hi")}`;
+          document.getElementById("net-worth").textContent = `₹${networth.toLocaleString("hi")}`;
+          document.getElementById("net-worth").style.color = isProfit ? "var(--success)" : "var(--danger)";
+          document.getElementById("profit-loss").textContent = `₹${profitloss.toLocaleString("hi")}`;
+          document.getElementById("profit-loss").style.color = isProfit ? "var(--success)" : "var(--danger)";
+
+          // Update chart
+          stockChart.data.labels = filteredXValues;
+          stockChart.data.datasets[0].data = filteredYValues;
           stockChart.update();
+
+          // Re-initialize Lucide icons after DOM updates
+          lucide.createIcons();
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
         });
     }
 
-    document.addEventListener("DOMContentLoaded", update);
-    setInterval(update, 1000);
-
+    document.addEventListener("DOMContentLoaded", () => {
+      update();
+      // Initialize icons on first load
+      lucide.createIcons();
+    });
     
+    setInterval(update, 1000);
   </script>
 </body>
 
