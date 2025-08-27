@@ -88,14 +88,62 @@ class Database {
     }
     db.stockprices[stockIndex].stocksbought += n;
     
-    // Price goes UP when bought
+    // Calculate price impact based on market dynamics
     let p = Number(db.stockprices[stockIndex].price);
-    p = parseFloat((p + 0.01 * p * (n/10)).toFixed(2));
+    
+    // Market demand ratio (how much of total stock is already bought)
+    const demandRatio = db.stockprices[stockIndex].stocksbought / db.stockprices[stockIndex].totalStock;
+    
+    // Volume impact (larger purchases have more impact)
+    const volumeImpact = n / db.stockprices[stockIndex].totalStock;
+    
+    // Base impact rate (starts at 0.5% for low demand, scales up to 2% for high demand)
+    const baseImpactRate = 0.005 + (demandRatio * 0.015);
+    
+    // Volume multiplier (larger trades have exponentially more impact)
+    const volumeMultiplier = 1 + Math.pow(volumeImpact * 100, 0.7);
+    
+    // Scarcity multiplier (prices rise faster when more stock is already bought)
+    const scarcityMultiplier = 1 + (demandRatio * 2);
+    
+    // Final impact calculation
+    const priceImpact = baseImpactRate * volumeMultiplier * scarcityMultiplier;
+    
+    // Apply the price increase
+    p = parseFloat((p * (1 + priceImpact)).toFixed(2));
+    
     db.stockprices[stockIndex].price = p.toFixed(2);
     fs.writeFileSync('./database.json', JSON.stringify(db));
     
     return { success: true, message: "Transaction successful", stocks: db.schooldata[schoolIndex].stocks[stockIndex] };
   }
+
+  /*
+    New Buying Formula:
+Components:
+
+Demand Ratio: stocksbought / totalStock - measures market saturation
+Volume Impact: n / totalStock - measures trade size relative to company
+Base Impact Rate: 0.5% to 2% based on demand
+Volume Multiplier: Exponential impact for larger trades
+Scarcity Multiplier: Higher prices when more stock is owned
+Formula:
+
+priceImpact = baseImpactRate × volumeMultiplier × scarcityMultiplier
+newPrice = currentPrice × (1 + priceImpact)
+    
+
+New Selling Formula:
+Components:
+
+Supply Ratio: Remaining demand after sale
+Volume Impact: Sale size relative to total stock
+Base Decline Rate: 0.3% to 1.5% based on remaining demand
+Volume Multiplier: Larger sales have more impact
+Supply Multiplier: Prices drop faster with less demand
+Selling Dampener: 0.7 multiplier (selling has less impact than buying)
+
+    */
 
   sellStock(school, stockname, n) {
     const db = require('./database.json');
@@ -115,16 +163,42 @@ class Database {
     if(db.stockprices[stockIndex].lastBoughtBy===school){
       db.schooldata[schoolIndex].stocks[stockIndex] -= n;
       db.schooldata[schoolIndex].cash += (db.stockprices[stockIndex].lastBoughtPrice) * n;
-    } else {
-      db.schooldata[schoolIndex].stocks[stockIndex] -= n;
-      db.schooldata[schoolIndex].cash += (db.stockprices[stockIndex].price) * n;
-      // Price goes DOWN when sold
-      db.stockprices[stockIndex].price = parseFloat(
-        (db.stockprices[stockIndex].price - 0.01 * db.stockprices[stockIndex].price * (n/10)).toFixed(2)
-      );
-    }
-    
-    // Update stocks bought counter (decrease when sold, making volume available again)
+      db.stockprices[stockIndex].price = db.stockprices[stockIndex].lastBoughtPrice;
+
+      } else {
+        db.schooldata[schoolIndex].stocks[stockIndex] -= n;
+        db.schooldata[schoolIndex].cash += (db.stockprices[stockIndex].price) * n;
+        
+        // Calculate price decrease based on selling pressure
+        let p = Number(db.stockprices[stockIndex].price);
+        
+        // Market supply increase (selling increases available supply)
+        const supplyRatio = (db.stockprices[stockIndex].stocksbought - n) / db.stockprices[stockIndex].totalStock;
+        
+        // Volume impact (larger sales have more impact)
+        const volumeImpact = n / db.stockprices[stockIndex].totalStock;
+        
+        // Base decline rate (starts at 0.3% for high demand stocks, up to 1.5% for low demand)
+        const baseDeclineRate = 0.003 + ((1 - supplyRatio) * 0.012);
+        
+        // Volume multiplier (larger sales have more impact)
+        const volumeMultiplier = 1 + Math.pow(volumeImpact * 100, 0.6);
+        
+        // Supply multiplier (prices drop faster when there's less demand)
+        const supplyMultiplier = 1 + ((1 - supplyRatio) * 1.5);
+        
+        // Final impact calculation (selling has less impact than buying)
+        const priceDecline = baseDeclineRate * volumeMultiplier * supplyMultiplier * 0.7;
+        
+        // Apply the price decrease
+        p = parseFloat((p * (1 - priceDecline)).toFixed(2));
+        
+        // Ensure price doesn't go below a minimum threshold (10% of original value)
+        const minPrice = 0.1 * Number(db.stockprices[stockIndex].price);
+        if (p < minPrice) p = minPrice;
+        
+        db.stockprices[stockIndex].price = p.toFixed(2);
+      }    // Update stocks bought counter (decrease when sold, making volume available again)
     if (!db.stockprices[stockIndex].stocksbought) {
       db.stockprices[stockIndex].stocksbought = 0;
     }
