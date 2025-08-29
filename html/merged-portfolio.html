@@ -1686,9 +1686,18 @@
       
       let currentcash = parseFloat(db.schooldata[si].cash);
 
-      // Initialize price history on first load
-      if (isFirstLoad) {
-        initializeStockPriceHistory(sp);
+      // Use real stock price history from database
+      if (db.stockPriceHistory) {
+        stockPriceHistory = {};
+        db.stockPriceHistory.forEach((history, index) => {
+          stockPriceHistory[index] = history || [];
+        });
+        console.log("Loaded stock price history from database:", stockPriceHistory);
+      } else {
+        // Initialize price history on first load (fallback)
+        if (isFirstLoad) {
+          initializeStockPriceHistory(sp);
+        }
       }
 
       // Detect price changes and stock holding changes

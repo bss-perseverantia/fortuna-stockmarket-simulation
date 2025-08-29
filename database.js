@@ -28,6 +28,7 @@ class Database {
     var database = {
       schooldata: [],
       stockprices: [],
+      stockPriceHistory: [],
     };
     database.stockprices = config.stockprices;
     const sp = JSON.parse(process.env.all_prices);
@@ -37,6 +38,16 @@ class Database {
       database.allPrices.push([]);
     }
     database.whitePrices = false;
+    
+    // Initialize stock price history with current prices and timestamps
+    database.stockPriceHistory = [];
+    for(let i = 0; i < database.stockprices.length; i++) {
+      database.stockPriceHistory.push([{
+        price: database.stockprices[i].price,
+        timestamp: new Date().toISOString(),
+        change: 0
+      }]);
+    }
     const fs = require('fs');
 
     //        var accounts = [];
@@ -48,12 +59,56 @@ class Database {
       });
       // accounts[i] = {"username":schools[i],"password":makeid(6)};
     }
-    console.log(database);
+    //console.log(database);
     
     this.ogdb = database;
-    console.log(database==this.ogdb);
+    //console.log(database==this.ogdb);
     // fs.writeFileSync('./database.json', JSON.stringify(database));
     //  fs.writeFileSync("./accounts.json", JSON.stringify(accounts));
+  }
+  
+  // Helper method to update stock price history
+  updateStockPriceHistory(stockIndex, oldPrice, newPrice) {
+    const db = require('./database.json');
+    
+    // Initialize stockPriceHistory if it doesn't exist
+    if (!db.stockPriceHistory) {
+      db.stockPriceHistory = [];
+      for(let i = 0; i < db.stockprices.length; i++) {
+        db.stockPriceHistory.push([{
+          price: db.stockprices[i].price,
+          timestamp: new Date().toISOString(),
+          change: 0
+        }]);
+      }
+    }
+    
+    // Ensure the stock index has a history array
+    if (!db.stockPriceHistory[stockIndex]) {
+      db.stockPriceHistory[stockIndex] = [{
+        price: oldPrice,
+        timestamp: new Date().toISOString(),
+        change: 0
+      }];
+    }
+    
+    // Add new price point if the price actually changed
+    if (oldPrice !== newPrice) {
+      const change = ((newPrice - oldPrice) / oldPrice) * 100;
+      
+      db.stockPriceHistory[stockIndex].push({
+        price: parseFloat(newPrice),
+        timestamp: new Date().toISOString(),
+        change: parseFloat(change.toFixed(2))
+      });
+      
+      // Keep only last 100 price points to prevent database from growing too large
+      if (db.stockPriceHistory[stockIndex].length > 100) {
+        db.stockPriceHistory[stockIndex] = db.stockPriceHistory[stockIndex].slice(-100);
+      }
+    }
+    
+    return db;
   }
   buyStock(school, stockname, n) {
     const db = require('./database.json');
@@ -90,6 +145,7 @@ class Database {
     
     // Calculate price impact based on market dynamics (reduced impact)
     let p = Number(db.stockprices[stockIndex].price);
+    const oldPrice = p;
     
     // Market demand ratio (how much of total stock is already bought)
     const demandRatio = db.stockprices[stockIndex].stocksbought / db.stockprices[stockIndex].totalStock;
@@ -113,7 +169,10 @@ class Database {
     p = parseFloat((p * (1 + priceImpact)).toFixed(2));
     
     db.stockprices[stockIndex].price = p.toFixed(2);
-    fs.writeFileSync('./database.json', JSON.stringify(db));
+    
+    // Update price history
+    const updatedDb = this.updateStockPriceHistory(stockIndex, oldPrice, p);
+    fs.writeFileSync('./database.json', JSON.stringify(updatedDb));
     
     return { success: true, message: "Transaction successful", stocks: db.schooldata[schoolIndex].stocks[stockIndex] };
   }
@@ -171,6 +230,7 @@ Selling Dampener: 0.7 multiplier (selling has less impact than buying)
         
         // Calculate price decrease based on selling pressure
         let p = Number(db.stockprices[stockIndex].price);
+        const oldPrice = p;
         
         // Market supply increase (selling increases available supply)
         const supplyRatio = (db.stockprices[stockIndex].stocksbought - n) / db.stockprices[stockIndex].totalStock;
@@ -198,6 +258,11 @@ Selling Dampener: 0.7 multiplier (selling has less impact than buying)
         if (p < minPrice) p = minPrice;
         
         db.stockprices[stockIndex].price = p.toFixed(2);
+        
+        // Update price history
+        const updatedDb = this.updateStockPriceHistory(stockIndex, oldPrice, p);
+        // Update the db reference to the updated database
+        Object.assign(db, updatedDb);
       }    // Update stocks bought counter (decrease when sold, making volume available again)
     if (!db.stockprices[stockIndex].stocksbought) {
       db.stockprices[stockIndex].stocksbought = 0;
@@ -217,6 +282,38 @@ Selling Dampener: 0.7 multiplier (selling has less impact than buying)
     const data = require('./database.json');
     return data.stockprices;
   }
+  
+  getStockPriceHistory(stockIndex = null) {
+    const data = require('./database.json');
+    
+    // Initialize stockPriceHistory if it doesn't exist
+    if (!data.stockPriceHistory) {
+      data.stockPriceHistory = [];
+      for(let i = 0; i < data.stockprices.length; i++) {
+        data.stockPriceHistory.push([{
+          price: data.stockprices[i].price,
+          timestamp: new Date().toISOString(),
+          change: 0
+        }]);
+      }
+      fs.writeFileSync('./database.json', JSON.stringify(data));
+    }
+    
+    if (stockIndex !== null) {
+      return data.stockPriceHistory[stockIndex] || [];
+    }
+    
+    return data.stockPriceHistory;
+  }
+  
+  getAllStockData() {
+    const data = require('./database.json');
+    return {
+      stockprices: data.stockprices,
+      stockPriceHistory: this.getStockPriceHistory(),
+      schooldata: data.schooldata
+    };
+  }
   setStockValue(i, prices) {
     const data = require('./database.json');
     data.stockprices[i].price = prices;
@@ -224,9 +321,22 @@ Selling Dampener: 0.7 multiplier (selling has less impact than buying)
   }
   setPrice(stock, price) {
     var data = require('./database.json');
-    data.stockprices.find((i) => i.name === stock).price = price;
-    data.stockprices.find((i) => i.name === stock).lastBoughtPrice =price;
-    fs.writeFileSync('./database.json', JSON.stringify(data));
+    const stockObj = data.stockprices.find((i) => i.name === stock);
+    const stockIndex = data.stockprices.findIndex((i) => i.name === stock);
+    
+    if (stockObj && stockIndex !== -1) {
+      const oldPrice = parseFloat(stockObj.price);
+      const newPrice = parseFloat(price);
+      
+      stockObj.price = price;
+      stockObj.lastBoughtPrice = price;
+      
+      // Update price history
+      const updatedDb = this.updateStockPriceHistory(stockIndex, oldPrice, newPrice);
+      fs.writeFileSync('./database.json', JSON.stringify(updatedDb));
+    } else {
+      fs.writeFileSync('./database.json', JSON.stringify(data));
+    }
   }
   resetDatabase() {
     fs.writeFileSync('./database.json', JSON.stringify(this.ogdb));

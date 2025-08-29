@@ -30,7 +30,6 @@ module.exports = {
     "lastBoughtPrice":0,
     "lastBoughtQty":0,
     "stocksbought":0,
-
   }
 ]
 };

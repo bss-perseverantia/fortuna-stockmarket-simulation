@@ -46,6 +46,22 @@ function getCurrentData() {
   let path = './database.json';
   delete require.cache[require.resolve(path)];
   let d = require(path);
+  
+  // Initialize stockPriceHistory if it doesn't exist
+  if (!d.stockPriceHistory) {
+    d.stockPriceHistory = [];
+    for(let i = 0; i < d.stockprices.length; i++) {
+      d.stockPriceHistory.push([{
+        price: d.stockprices[i].price,
+        timestamp: new Date().toISOString(),
+        change: 0
+      }]);
+    }
+    // Save the updated data
+    const fs = require('fs');
+    fs.writeFileSync('./database.json', JSON.stringify(d));
+  }
+  
   d.tradetime = tradetime;
   return d;
 }
@@ -173,14 +189,12 @@ app.get('/api/stockPrices', (req, res) => {
   res.json(sl);
 });
 app.get('/', (req, res) => {
-  console.log('helo');
   return res.sendFile(__dirname + '/html/login.html');
 });
 
 app.post('/login', (req, res) => {
   let usr = req.body.username.toUpperCase();
   let pass = req.body.password;
-  console.log(process.env.accounts);
   const acc = JSON.parse(process.env.accounts);
   if (!usr || !pass) {
     return res.redirect('/?error=Invalid%20username%20or%20password');
@@ -261,7 +275,6 @@ app.get('/adminauth', (req, res) => {
 app.get('/setTT', (req, res) => {
   if (req.query.u == u && req.query.p == p) {
     tradetime = req.query.value === 'true';
-    console.log(tradetime);
     return res.json({data: 'success'});
   } else {
     return res.json({data: 'false'});
