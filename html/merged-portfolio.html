@@ -129,17 +129,19 @@
     }
 
     .modern-table th:nth-child(1),
-    .modern-table td:nth-child(1) { width: 15%; } /* Sector */
+    .modern-table td:nth-child(1) { width: 12%; } /* Sector */
     .modern-table th:nth-child(2),
-    .modern-table td:nth-child(2) { width: 25%; } /* Company */
+    .modern-table td:nth-child(2) { width: 20%; } /* Company */
     .modern-table th:nth-child(3),
-    .modern-table td:nth-child(3) { width: 20%; } /* Price */
+    .modern-table td:nth-child(3) { width: 15%; } /* Price */
     .modern-table th:nth-child(4),
-    .modern-table td:nth-child(4) { width: 12%; } /* Owned */
+    .modern-table td:nth-child(4) { width: 10%; } /* Owned */
     .modern-table th:nth-child(5),
-    .modern-table td:nth-child(5) { width: 13%; } /* % Owned */
+    .modern-table td:nth-child(5) { width: 10%; } /* % Owned */
     .modern-table th:nth-child(6),
-    .modern-table td:nth-child(6) { width: 15%; } /* Available */
+    .modern-table td:nth-child(6) { width: 12%; } /* Available */
+    .modern-table th:nth-child(7),
+    .modern-table td:nth-child(7) { width: 21%; } /* Risk */
 
     .table-header {
       background: linear-gradient(135deg, var(--tertiary-dark) 0%, var(--secondary-dark) 100%);
@@ -520,6 +522,7 @@
               <th class="px-3 py-2 text-left font-semibold text-xs" title="Owned">Owned</th>
               <th class="px-3 py-2 text-left font-semibold text-xs" title="% Owned">% Owned</th>
               <th class="px-3 py-2 text-left font-semibold text-xs" title="Available">Available</th>
+              <th class="px-3 py-2 text-left font-semibold text-xs" title="Risk Level">Risk</th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -1342,9 +1345,10 @@
             <td class="px-3 py-1 text-xs font-semibold" style="color: var(--text-primary);">${schoolData.stocks[i]}</td>
             <td class="px-3 py-1 text-xs" style="color: var(--gold-primary);">${ownedPercentage}%</td>
             <td class="px-3 py-1 text-xs" style="color: var(--text-secondary);">${(sp[i].totalStock-sp[i].stocksbought).toLocaleString("hi")}</td>
+            <td class="px-3 py-1 text-xs" style="color: var(--text-muted);">${sp[i].risk || 'N/A'}</td>
           </tr>
           <tr class="inline-chart-row">
-            <td colspan="6" style="padding: 0;">
+            <td colspan="7" style="padding: 0;">
               <div id="inline-chart-${i}" class="inline-chart-container ${showClass}">
                 <div class="flex items-center gap-2 mb-2">
                   <i data-lucide="trending-up" class="w-4 h-4" style="color: var(--gold-primary);"></i>

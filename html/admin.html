@@ -484,12 +484,70 @@
             backdrop-filter: blur(10px);
         }
 
+        /* Specific styling for select elements to ensure visibility on all platforms */
+        .form-group select {
+            background: var(--secondary-dark) !important;
+            color: var(--text-primary) !important;
+            border: 2px solid var(--border-color) !important;
+        }
+
+        .form-group select option {
+            background: var(--secondary-dark) !important;
+            color: var(--text-primary) !important;
+            padding: 0.5rem !important;
+        }
+
+        .form-group select option:hover,
+        .form-group select option:checked,
+        .form-group select option:focus {
+            background: var(--tertiary-dark) !important;
+            color: var(--gold-primary) !important;
+        }
+
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
             border-color: var(--accent);
             background: rgba(255, 255, 255, 0.08);
             box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
+        }
+
+        /* Override focus for select to maintain dark theme */
+        .form-group select:focus {
+            background: var(--tertiary-dark) !important;
+            border-color: var(--gold-primary) !important;
+        }
+
+        /* Global select styling for all dropdowns including revise-prices */
+        select {
+            background: var(--secondary-dark) !important;
+            color: var(--text-primary) !important;
+            border: 2px solid var(--border-color) !important;
+        }
+
+        select option {
+            background: var(--secondary-dark) !important;
+            color: var(--text-primary) !important;
+            padding: 0.5rem !important;
+        }
+
+        select option:hover,
+        select option:checked,
+        select option:focus {
+            background: var(--tertiary-dark) !important;
+            color: var(--gold-primary) !important;
+        }
+
+        /* Specific styling for revise-prices dropdown */
+        #revise-prices {
+            background: var(--secondary-dark) !important;
+            color: var(--text-primary) !important;
+            border: 2px solid var(--border-color) !important;
+        }
+
+        #revise-prices option {
+            background: var(--secondary-dark) !important;
+            color: var(--text-primary) !important;
         }
 
         .form-group input::placeholder {
@@ -610,7 +668,7 @@
 
             <div class="mb-6">
                 <label for="revise-prices" class="block mb-2">Revise Prices:</label>
-                <select id="revise-prices" class="w-full sm:w-auto px-4 py-2 rounded-md text-black"></select>
+                <select id="revise-prices" class="w-full sm:w-auto px-4 py-2 rounded-md"></select>
             </div>
             
             <div class="flex items-center gap-4 mb-6 hidden">
