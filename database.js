@@ -133,7 +133,7 @@ class Database {
     // Execute the transaction
     db.schooldata[schoolIndex].stocks[stockIndex] += n;
     db.stockprices[stockIndex].lastBoughtBy = school;
-    db.stockprices[stockIndex].lastBoughtPrice = db.stockprices[stockIndex].price;
+    // NOTE: lastBoughtPrice will be set after price calculation
     db.stockprices[stockIndex].lastBoughtQty = n;
     db.schooldata[schoolIndex].cash -= (db.stockprices[stockIndex].price) * n;
     
@@ -169,6 +169,9 @@ class Database {
     p = parseFloat((p * (1 + priceImpact)).toFixed(2));
     
     db.stockprices[stockIndex].price = p.toFixed(2);
+    
+    // NOW set lastBoughtPrice to the actual final price they paid (after impact)
+    db.stockprices[stockIndex].lastBoughtPrice = p.toFixed(2);
     
     // Update price history
     const updatedDb = this.updateStockPriceHistory(stockIndex, oldPrice, p);
@@ -222,7 +225,41 @@ Selling Dampener: 0.7 multiplier (selling has less impact than buying)
     if(db.stockprices[stockIndex].lastBoughtBy===school){
       db.schooldata[schoolIndex].stocks[stockIndex] -= n;
       db.schooldata[schoolIndex].cash += (db.stockprices[stockIndex].lastBoughtPrice) * n;
-      db.stockprices[stockIndex].price = db.stockprices[stockIndex].lastBoughtPrice;
+      
+      // Even for last buyer, apply price decrease to maintain market dynamics
+      let p = Number(db.stockprices[stockIndex].price);
+      const oldPrice = p;
+      
+      // Market supply increase (selling increases available supply)
+      const supplyRatio = (db.stockprices[stockIndex].stocksbought - n) / db.stockprices[stockIndex].totalStock;
+      
+      // Volume impact (larger sales have more impact)
+      const volumeImpact = n / db.stockprices[stockIndex].totalStock;
+      
+      // Base decline rate (starts at 0.3% for high demand stocks, up to 1.5% for low demand)
+      const baseDeclineRate = 0.003 + ((1 - supplyRatio) * 0.012);
+      
+      // Volume multiplier (larger sales have more impact)
+      const volumeMultiplier = 1 + Math.pow(volumeImpact * 100, 0.6);
+      
+      // Supply multiplier (prices drop faster when there's less demand)
+      const supplyMultiplier = 1 + ((1 - supplyRatio) * 1.5);
+      
+      // Final impact calculation (selling has less impact than buying)
+      const priceDecline = baseDeclineRate * volumeMultiplier * supplyMultiplier * 0.7;
+      
+      // Apply the price decrease
+      p = parseFloat((p * (1 - priceDecline)).toFixed(2));
+      
+      // Ensure price doesn't go below a minimum threshold (10% of original value)
+      const minPrice = 0.1 * Number(db.stockprices[stockIndex].lastBoughtPrice);
+      if (p < minPrice) p = minPrice;
+      
+      db.stockprices[stockIndex].price = p.toFixed(2);
+      
+      // Update price history
+      const updatedDb = this.updateStockPriceHistory(stockIndex, oldPrice, p);
+      Object.assign(db, updatedDb);
 
       } else {
         db.schooldata[schoolIndex].stocks[stockIndex] -= n;
