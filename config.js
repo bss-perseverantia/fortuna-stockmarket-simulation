@@ -74,7 +74,7 @@ module.exports = {
     "risk":"mid high to upper high"
   },
   {
-    "name": "Kissan Samriddhi",
+    "name": "Farmstead Features",
     "price": 450,
     "sector": "Agriculture",
     "totalStock": 20000,
